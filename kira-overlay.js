@@ -1,0 +1,347 @@
+(() => {
+  const WORDS = [
+    { word: 'clarity', translation: 'ясность', example: 'Clarity comes when you write one honest sentence.' },
+    { word: 'gentle', translation: 'мягкий, бережный', example: 'Be gentle with yourself after a heavy day.' },
+    { word: 'steady', translation: 'устойчивый', example: 'Keep it steady — one small step is enough today.' },
+    { word: 'focus', translation: 'фокус', example: 'Choose one focus for tonight.' },
+    { word: 'release', translation: 'отпустить', example: 'Release what you cannot fix today.' }
+  ];
+
+  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const entryStore = {};
+  const DATA_URL = 'data/entries.json';
+
+  function entryList() {
+    return Object.values(entryStore).filter(Boolean).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  }
+  function entriesForMonth(y, m) {
+    const prefix = `${y}-${String(m + 1).padStart(2, '0')}-`;
+    return entryList().filter((entry) => String(entry.date || '').startsWith(prefix));
+  }
+  function site(entry, key, fallback = '—') {
+    return entry?.site_blocks?.[key] || fallback;
+  }
+  function scoreClass(score) {
+    if (score == null || score === '') return '';
+    const n = Number(score);
+    if (Number.isNaN(n)) return '';
+    if (n >= 8) return 'score-good';
+    if (n >= 6) return 'score-steady';
+    if (n >= 4) return 'score-low';
+    return 'score-hard';
+  }
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>\"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[ch]));
+  }
+  async function loadEntries() {
+    try {
+      const res = await fetch(`${DATA_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) return {};
+      return await res.json();
+    } catch (err) {
+      console.warn('[KiraDiary] entries load failed', err);
+      return {};
+    }
+  }
+
+  function dateKey(d = new Date()) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+  function wordFor(key) {
+    const n = Number(key.replaceAll('-', '')) || 0;
+    return WORDS[n % WORDS.length];
+  }
+  function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+  function monthOffset(y, m) { return (new Date(y, m, 1).getDay() + 6) % 7; }
+
+  const now = new Date();
+  const todayKey = dateKey(now);
+  const todayWord = wordFor(todayKey);
+
+  const overlayHtml = `
+    <main id="kira-overlay" class="phone-frame" aria-label="Дневник">
+      <section class="hero-scene">
+        <div class="grain"></div>
+        <div class="kira-scroll">
+          <header class="topbar">
+            <div>
+              <h1 data-title hidden></h1>
+              <p class="screen-subtitle" data-subtitle>Автодневник · зеркало дня</p>
+            </div>
+          </header>
+
+          <section class="kira-screen is-active" data-screen="home">
+            <section class="score-card glass main-card empty-state-card">
+              <div class="score-head">
+                <div>
+                  <p class="label">Погода · Ишим</p>
+                  <div class="weather-main" data-weather-main>обновляю…</div>
+                  <div class="weather-meta" data-weather-meta>ощущается · ветер</div>
+                </div>
+                <div class="score-pill weather-pill" data-weather-time>сейчас</div>
+              </div>
+              <div class="wave is-empty"><span></span><span></span><span></span><i class="dot dot-l"></i><i class="dot dot-r"></i></div>
+            </section>
+
+            <section class="quick-grid">
+              <article class="glass tile"><span class="tile-icon icon-wake"></span><p>Настроение</p><strong data-tile-mood>—</strong></article>
+              <article class="glass tile"><span class="tile-icon icon-sleep"></span><p>Энергия</p><strong data-tile-energy>—</strong></article>
+              <article class="glass tile selected"><span class="tile-icon icon-habit"></span><p>Нужно</p><strong data-tile-needed>—</strong></article>
+              <article class="glass tile word-tile" data-word-open><span class="tile-icon icon-word">Aa</span><strong>${todayWord.word}</strong><small>${todayWord.translation}</small></article>
+            </section>
+
+            <section class="month-card glass">
+              <div class="month-head"><div><p class="label" data-month-name>${monthNames[now.getMonth()]}</p><strong data-month-status>Нет записей</strong></div></div>
+              <div class="dot-calendar real-month-dots" data-month-dots aria-label="заполненность месяца"></div>
+            </section>
+          </section>
+
+          <section class="kira-screen" data-screen="health">
+            <section class="health-card glass">
+              <div class="month-head"><div><p class="label">Здоровье</p><strong data-health-month>${monthNames[now.getMonth()]} · календарь</strong></div></div>
+              <div class="health-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+              <div class="health-calendar" data-health-calendar></div>
+            </section>
+
+            <section class="health-detail glass" data-health-detail>
+              <p class="label">День</p>
+              <strong>Нет данных</strong>
+              <span>Когда появится запись, здесь будут настроение, энергия, сон и заметка за выбранный день.</span>
+            </section>
+
+            <section class="stats-grid" data-health-stats>
+              <article class="glass stat-card" data-health-stat="mood"><p>Настроение</p><strong>—</strong><span>Появится после записей.</span></article>
+              <article class="glass stat-card" data-health-stat="sleep-energy"><p>Сон → энергия</p><strong>—</strong><span>Нужно больше данных.</span></article>
+              <article class="glass stat-card" data-health-stat="stress"><p>Стресс</p><strong>—</strong><span>Пока паттернов нет.</span></article>
+              <article class="glass stat-card" data-health-stat="helps"><p>Что помогает</p><strong>—</strong><span>Кира найдёт повторяющиеся опоры.</span></article>
+            </section>
+          </section>
+
+          <section class="kira-screen" data-screen="kira">
+            <section class="health-card glass"><p class="label">Кира</p><strong>Автоподхват</strong><p class="plain-text">Если в сообщении или голосовом есть дневник, день, настроение, сон, стресс или здоровье — Кира должна перенести это в нужную дату.</p><div class="agent-flow"><span>текст/голос</span><i></i><span>анализ</span><i></i><span>дневник</span></div></section>
+            <section class="health-detail glass"><p class="label">Готово для связки</p><strong>KiraDiaryBridge</strong><span>Позже подключим реальный автосейв из чата.</span></section>
+          </section>
+
+          <section class="kira-screen" data-screen="system">
+            <section class="health-card glass"><p class="label">Система</p><strong>Настройки</strong><p class="plain-text">Здесь позже будут экспорт, импорт, бэкап и параметры дневника.</p></section>
+          </section>
+        </div>
+
+        <nav class="multitool-nav" aria-label="Навигация">
+          <button class="multitool-item is-active" type="button" aria-label="Главная" data-tab="home"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M6.5 10.2v8.3h11v-8.3"/><path d="M10 18.5v-5h4v5"/></svg><span>Главная</span></button>
+          <button class="multitool-item" type="button" aria-label="Здоровье" data-tab="health"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7.8c0 5.2-8 10.2-8 10.2S4 13 4 7.8A4.2 4.2 0 0 1 12 6a4.2 4.2 0 0 1 8 1.8Z"/><path d="M8 12h2.2l1-2.5 1.7 5 1.1-2.5H16"/></svg><span>Здоровье</span></button>
+          <button class="multitool-item" type="button" aria-label="Кира" data-tab="kira"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-4 3-6 6.5-6s5.7 2 6.5 6"/></svg><span>Кира</span></button>
+          <button class="multitool-item" type="button" aria-label="Система" data-tab="system"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 7.4v8.2l-7 4.9-7-4.9V7.4z"/><path d="M5.4 7.8 12 11.8l6.6-4"/><path d="M12 11.8v8.1"/></svg><span>Система</span></button>
+        </nav>
+
+        <div class="word-popover" data-word-popover hidden><div class="word-card glass"><button class="word-close" type="button" data-word-close>×</button><p class="label">Слово дня</p><strong>${todayWord.word}</strong><span>${todayWord.translation}</span><p>${todayWord.example}</p></div></div>
+      </section>
+    </main>`;
+
+
+  async function updateWeather(overlay) {
+    const main = overlay.querySelector('[data-weather-main]');
+    const meta = overlay.querySelector('[data-weather-meta]');
+    const time = overlay.querySelector('[data-weather-time]');
+    if (!main || !meta) return;
+    try {
+      const url = 'https://api.open-meteo.com/v1/forecast?latitude=56.1128&longitude=69.4902&current=temperature_2m,apparent_temperature,wind_speed_10m&timezone=Asia%2FYekaterinburg';
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('weather http ' + res.status);
+      const data = await res.json();
+      const c = data.current || {};
+      const temp = Math.round(c.temperature_2m);
+      const feels = Math.round(c.apparent_temperature);
+      const wind = Math.round(c.wind_speed_10m);
+      main.textContent = `${temp > 0 ? '+' : ''}${temp}°`;
+      meta.textContent = `ощущается ${feels > 0 ? '+' : ''}${feels}° · ветер ${wind} км/ч`;
+      if (time) time.textContent = 'Ишим';
+    } catch (err) {
+      main.textContent = 'погода недоступна';
+      meta.textContent = 'проверь соединение · Ишим';
+      if (time) time.textContent = 'онлайн';
+    }
+  }
+
+  function renderMonthDots(root, y, m) {
+    let html = '';
+    const total = daysInMonth(y, m);
+    for (let d = 1; d <= total; d++) {
+      const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      html += `<i class="${entryStore[k] ? 'filled' : 'empty'}"></i>`;
+    }
+    root.innerHTML = html;
+  }
+
+  function renderCalendar(root, y, m) {
+    let html = '';
+    for (let i = 0; i < monthOffset(y, m); i++) html += '<span class="cal-spacer"></span>';
+    for (let d = 1; d <= daysInMonth(y, m); d++) {
+      const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const filled = !!entryStore[k];
+      html += `<button type="button" class="health-day ${filled ? 'has-entry' : ''}" data-date="${k}"><b>${d}</b>${filled ? '<i></i>' : ''}</button>`;
+    }
+    root.innerHTML = html;
+  }
+
+
+  function renderEntryDetail(detail, entry, date) {
+    if (!entry) {
+      detail.innerHTML = `<p class="label">${date}</p><strong>Нет записи</strong><span>Этот день пока пустой.</span>`;
+      return;
+    }
+    const score = entry.kira_score ?? entry.score;
+    detail.innerHTML = `
+      <p class="label">${escapeHtml(date)}</p>
+      <strong>${escapeHtml(site(entry, 'mood', 'Запись есть'))}</strong>
+      <span>${escapeHtml(site(entry, 'health_detail', entry.raw_transcript || 'Данные сохранены.'))}</span>
+      <span>Энергия: ${escapeHtml(site(entry, 'energy'))}</span>
+      <span>Стресс: ${escapeHtml(site(entry, 'stress'))}</span>
+      <span>Нужно: ${escapeHtml(site(entry, 'needed'))}</span>
+      <span>${score == null ? 'Kira Score: —' : `Kira Score: ${escapeHtml(score)}`}</span>`;
+  }
+
+  function setHealthStat(overlay, key, value, note) {
+    const card = overlay.querySelector(`[data-health-stat="${key}"]`);
+    if (!card) return;
+    const strong = card.querySelector('strong');
+    const span = card.querySelector('span');
+    if (strong) strong.textContent = value || '—';
+    if (span) span.textContent = note || 'Нет данных.';
+  }
+
+  function shortStress(value) {
+    const text = String(value || '').toLowerCase();
+    if (!text) return '—';
+    if (text.includes('высок')) return 'высокий';
+    if (text.includes('сред')) return 'средний';
+    if (text.includes('низ')) return 'низкий';
+    return String(value).split(/[,.]/)[0].trim() || 'есть';
+  }
+
+  function countListLike(value) {
+    if (Array.isArray(value)) return value.length;
+    if (!value) return 0;
+    return String(value).split(/[,;·]/).map((x) => x.trim()).filter(Boolean).length;
+  }
+
+  function renderHealthStats(overlay, entry) {
+    if (!entry) {
+      setHealthStat(overlay, 'mood', '—', 'Появится после записей.');
+      setHealthStat(overlay, 'sleep-energy', '—', 'Нужно больше данных.');
+      setHealthStat(overlay, 'stress', '—', 'Пока паттернов нет.');
+      setHealthStat(overlay, 'helps', '—', 'Кира найдёт повторяющиеся опоры.');
+      return;
+    }
+
+    const score = entry.kira_score ?? entry.score;
+    const sleep = entry.sleep || {};
+    const siteBlocks = entry.site_blocks || {};
+    const moodValue = siteBlocks.mood_score || (score == null ? '—' : String(score));
+    const moodNote = siteBlocks.mood || [entry.state?.mood_morning, entry.state?.mood_evening].filter(Boolean).join(' → ') || 'Настроение сохранено.';
+    const sleepValue = sleep.duration_hours ? `${sleep.duration_hours}ч / ${siteBlocks.energy_score || '—'}` : (siteBlocks.energy_score || '—');
+    const sleepNote = [sleep.sleep_time && sleep.wake_time ? `${sleep.sleep_time}–${sleep.wake_time}` : '', siteBlocks.energy || sleep.quality || ''].filter(Boolean).join(' · ') || 'Нет данных по сну.';
+    const stressNote = siteBlocks.stress || entry.state?.stress || 'Нет данных по стрессу.';
+    const helps = siteBlocks.what_helps || '';
+    const helpsCount = countListLike(helps);
+
+    setHealthStat(overlay, 'mood', moodValue, moodNote);
+    setHealthStat(overlay, 'sleep-energy', sleepValue, sleepNote);
+    setHealthStat(overlay, 'stress', shortStress(stressNote), stressNote);
+    setHealthStat(overlay, 'helps', helpsCount ? `${helpsCount} опоры` : '—', helps || 'Пока опоры не выделены.');
+  }
+
+  function renderToday(overlay, y, m) {
+    const todayEntry = entryStore[todayKey] || entryList().at(-1);
+    const monthEntries = entriesForMonth(y, m);
+    const status = overlay.querySelector('[data-month-status]');
+    const score = todayEntry?.kira_score ?? todayEntry?.score;
+    if (status) status.textContent = monthEntries.length ? `${monthEntries.length} записей` : 'Нет записей';
+    overlay.querySelector('[data-tile-mood]').textContent = site(todayEntry, 'mood_score', score == null ? '—' : String(score));
+    overlay.querySelector('[data-tile-energy]').textContent = site(todayEntry, 'energy_score', todayEntry?.state?.energy_score ?? '—');
+    overlay.querySelector('[data-tile-needed]').textContent = site(todayEntry, 'needed_score', todayEntry?.needs_score ?? '—');
+    renderHealthStats(overlay, todayEntry);
+  }
+
+  async function mountOverlay() {
+    document.querySelectorAll('#kira-overlay').forEach((node) => node.remove());
+    document.body.insertAdjacentHTML('beforeend', overlayHtml);
+    document.body.classList.add('kira-mode');
+
+    const overlay = document.querySelector('#kira-overlay');
+    const title = overlay.querySelector('[data-title]');
+    const subtitle = overlay.querySelector('[data-subtitle]');
+    const calendar = overlay.querySelector('[data-health-calendar]');
+    const dots = overlay.querySelector('[data-month-dots]');
+    const detail = overlay.querySelector('[data-health-detail]');
+    const y = now.getFullYear();
+    const m = now.getMonth();
+
+    Object.assign(entryStore, await loadEntries());
+    const todayEntryForHealth = entryStore[todayKey] || entryList().at(-1);
+
+    renderCalendar(calendar, y, m);
+    renderMonthDots(dots, y, m);
+    renderToday(overlay, y, m);
+    if (todayEntryForHealth) {
+      const activeDay = calendar.querySelector(`[data-date="${todayEntryForHealth.date}"]`);
+      if (activeDay) activeDay.classList.add('selected');
+      renderEntryDetail(detail, todayEntryForHealth, todayEntryForHealth.date);
+      renderHealthStats(overlay, todayEntryForHealth);
+    }
+    updateWeather(overlay);
+    setInterval(() => updateWeather(overlay), 10 * 60 * 1000);
+
+    const titles = {
+      home: ['', 'Автодневник · зеркало дня'],
+      health: ['Здоровье', 'Календарь · паттерны · тело'],
+      kira: ['Кира', 'Логика автоподхвата'],
+      system: ['Система', 'Настройки · бэкап']
+    };
+
+    overlay.querySelectorAll('[data-tab]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        overlay.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('is-active', b === btn));
+        overlay.querySelectorAll('[data-screen]').forEach(s => s.classList.toggle('is-active', s.dataset.screen === tab));
+        title.textContent = titles[tab][0];
+        subtitle.textContent = titles[tab][1];
+        overlay.querySelector('.kira-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    calendar.addEventListener('click', (e) => {
+      const day = e.target.closest('.health-day');
+      if (!day) return;
+      calendar.querySelectorAll('.health-day').forEach(d => d.classList.remove('selected'));
+      day.classList.add('selected');
+      const selectedEntry = entryStore[day.dataset.date];
+      renderEntryDetail(detail, selectedEntry, day.dataset.date);
+      renderHealthStats(overlay, selectedEntry);
+    });
+
+    const pop = overlay.querySelector('[data-word-popover]');
+    overlay.querySelector('[data-word-open]').addEventListener('click', () => { pop.hidden = false; });
+    overlay.querySelector('[data-word-close]').addEventListener('click', () => { pop.hidden = true; });
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.hidden = true; });
+
+    window.KiraDiaryBridge = {
+      version: 2,
+      getEntries: () => structuredClone(entryStore),
+      addEntryFromText: (text, date = dateKey()) => {
+        entryStore[date] = { text: String(text).slice(0, 500), createdAt: new Date().toISOString() };
+        renderCalendar(calendar, y, m);
+        renderMonthDots(dots, y, m);
+        renderToday(overlay, y, m);
+        window.dispatchEvent(new CustomEvent('kira:diary-entry-added', { detail: { date, text } }));
+        return entryStore[date];
+      }
+    };
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(mountOverlay, 900));
+  else setTimeout(mountOverlay, 900);
+})();

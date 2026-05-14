@@ -309,7 +309,16 @@ h1 {
   background: rgba(0,0,0,.035);
 }
 .tile p { margin: 34px 0 8px; color: rgba(255,255,255,.58); font-size: 12px; font-weight: 650; }
-.tile strong { font-size: 22px; letter-spacing: -.045em; font-weight: 720; }
+.tile strong {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 22px;
+  letter-spacing: -.045em;
+  font-weight: 720;
+}
 
 .tile-icon {
   position: absolute;
@@ -367,4 +376,981 @@ h1 {
   .quick-grid { gap: 10px; }
   .month-head strong { font-size: 19px; }
   .dot-calendar { gap: 10px; }
+}
+
+/* Kira overlay mode: keep Monopo canvas, hide Monopo buttons/text, show our glass diary UI */
+body.kira-mode {
+  display: block;
+  min-height: 100svh;
+  background: #000;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.kira-mode #__nuxt {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  background: #000 !important;
+}
+
+body.kira-mode #__nuxt canvas,
+body.kira-mode #__nuxt img,
+body.kira-mode #__nuxt video,
+body.kira-mode #__nuxt picture,
+body.kira-mode #__nuxt svg {
+  pointer-events: none !important;
+}
+
+body.kira-mode #__nuxt a,
+body.kira-mode #__nuxt button,
+body.kira-mode #__nuxt header,
+body.kira-mode #__nuxt nav,
+body.kira-mode #__nuxt ul,
+body.kira-mode #__nuxt li,
+body.kira-mode #__nuxt p,
+body.kira-mode #__nuxt h1,
+body.kira-mode #__nuxt h2,
+body.kira-mode #__nuxt h3,
+body.kira-mode #__nuxt span {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.kira-mode #kira-overlay.phone-frame {
+  width: min(430px, 100vw);
+  min-height: 100svh;
+  margin: 0 auto;
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+  background: transparent;
+  pointer-events: auto;
+}
+
+body.kira-mode #kira-overlay .hero-scene {
+  position: relative;
+  min-height: 100svh;
+  padding: max(28px, env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));
+  overflow: visible;
+  background: transparent !important;
+}
+
+body.kira-mode #kira-overlay .grain {
+  position: fixed;
+  inset: 0;
+  opacity: .12;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body.kira-mode #kira-overlay .glass {
+  background: rgba(0,0,0,.10);
+  border-color: rgba(255,255,255,.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+  backdrop-filter: blur(18px) saturate(1.45);
+  -webkit-backdrop-filter: blur(18px) saturate(1.45);
+}
+
+body.kira-mode #kira-overlay .sync-pill,
+body.kira-mode #kira-overlay .score-pill {
+  background: rgba(0,0,0,.12);
+  border-color: rgba(255,255,255,.13);
+  backdrop-filter: blur(18px) saturate(1.45);
+  -webkit-backdrop-filter: blur(18px) saturate(1.45);
+}
+
+/* Bottom multitool navigation. Clean rounded bar without black/gray protruding corners. */
+body.kira-mode #kira-overlay .multitool-nav {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 18px 0 2px;
+  padding: 8px;
+  border-radius: 30px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(135deg, rgba(255, 204, 106, .18), rgba(255, 126, 44, .10) 42%, rgba(70, 18, 8, .14)),
+    rgba(0,0,0,.08);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -1px 0 rgba(0,0,0,.10),
+    0 12px 28px rgba(0,0,0,.10);
+  backdrop-filter: blur(18px) saturate(1.45);
+  -webkit-backdrop-filter: blur(18px) saturate(1.45);
+}
+
+body.kira-mode #kira-overlay .multitool-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,.22), transparent 26%),
+    radial-gradient(circle at 80% 18%, rgba(255,170,64,.18), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,.09), transparent 55%);
+}
+
+body.kira-mode #kira-overlay .multitool-item {
+  appearance: none;
+  border: 0;
+  min-width: 0;
+  height: 68px;
+  padding: 8px 4px 7px;
+  border-radius: 23px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: rgba(255,255,255,.88);
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: -.02em;
+  text-shadow: 0 1px 2px rgba(0,0,0,.24);
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+body.kira-mode #kira-overlay .multitool-item.is-active {
+  background: rgba(0,0,0,.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.11),
+    inset 0 -1px 0 rgba(0,0,0,.12);
+}
+
+body.kira-mode #kira-overlay .multitool-item:active {
+  transform: scale(.96);
+}
+
+body.kira-mode #kira-overlay .mt-icon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: block;
+  color: rgba(255,255,255,.94);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.18));
+}
+
+body.kira-mode #kira-overlay .mt-icon::before,
+body.kira-mode #kira-overlay .mt-icon::after {
+  content: "";
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+}
+
+body.kira-mode #kira-overlay .mt-home::before {
+  width: 17px;
+  height: 15px;
+  left: 3.5px;
+  top: 7px;
+  border: 1.7px solid currentColor;
+  border-top: 0;
+  border-radius: 3px 3px 5px 5px;
+}
+body.kira-mode #kira-overlay .mt-home::after {
+  width: 15px;
+  height: 15px;
+  left: 4.5px;
+  top: 2px;
+  border-left: 1.7px solid currentColor;
+  border-top: 1.7px solid currentColor;
+  transform: rotate(45deg);
+  border-radius: 3px 0 0 0;
+}
+
+body.kira-mode #kira-overlay .mt-auto::before {
+  width: 8px;
+  height: 17px;
+  left: 3px;
+  top: 4px;
+  border: 1.7px solid currentColor;
+  border-radius: 4px;
+}
+body.kira-mode #kira-overlay .mt-auto::after {
+  width: 8px;
+  height: 17px;
+  right: 3px;
+  top: 4px;
+  border: 1.7px solid currentColor;
+  border-radius: 4px;
+}
+
+body.kira-mode #kira-overlay .mt-user::before {
+  width: 9px;
+  height: 9px;
+  left: 7.5px;
+  top: 3px;
+  border: 1.7px solid currentColor;
+  border-radius: 50%;
+}
+body.kira-mode #kira-overlay .mt-user::after {
+  width: 18px;
+  height: 10px;
+  left: 3px;
+  top: 14px;
+  border: 1.7px solid currentColor;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+
+body.kira-mode #kira-overlay .mt-cube::before {
+  width: 15px;
+  height: 15px;
+  left: 4.5px;
+  top: 5px;
+  border: 1.7px solid currentColor;
+  transform: skewY(-28deg);
+  border-radius: 2px;
+}
+body.kira-mode #kira-overlay .mt-cube::after {
+  width: 9px;
+  height: 15px;
+  right: 3px;
+  top: 5px;
+  border-top: 1.7px solid currentColor;
+  border-right: 1.7px solid currentColor;
+  border-bottom: 1.7px solid currentColor;
+  transform: skewY(28deg);
+  border-radius: 0 2px 2px 0;
+  opacity: .9;
+}
+
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .multitool-nav {
+    margin-top: 14px;
+    padding: 7px;
+  }
+  body.kira-mode #kira-overlay .multitool-item {
+    height: 58px;
+    gap: 4px;
+    font-size: 10px;
+  }
+  body.kira-mode #kira-overlay .mt-icon {
+    width: 21px;
+    height: 21px;
+    transform: scale(.9);
+  }
+}
+
+/* Refinement: closer to reference — more rounded capsule and original-like SVG icons */
+body.kira-mode #kira-overlay .multitool-nav {
+  border-radius: 999px;
+  padding: 7px 9px;
+  gap: 2px;
+  margin: 18px 2px 2px;
+  min-height: 82px;
+  background:
+    linear-gradient(135deg, rgba(255, 222, 137, .20), rgba(255, 146, 45, .12) 45%, rgba(78, 20, 8, .12)),
+    rgba(10, 7, 4, .06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.26),
+    inset 0 -1px 0 rgba(0,0,0,.08),
+    0 10px 24px rgba(0,0,0,.08);
+}
+
+body.kira-mode #kira-overlay .multitool-item {
+  height: 68px;
+  border-radius: 999px;
+  gap: 5px;
+  padding: 8px 2px 7px;
+}
+
+body.kira-mode #kira-overlay .multitool-item.is-active {
+  background: rgba(0,0,0,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(0,0,0,.10);
+}
+
+body.kira-mode #kira-overlay .mt-svg {
+  width: 25px;
+  height: 25px;
+  display: block;
+  fill: none;
+  stroke: rgba(255,255,255,.95);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.18));
+}
+
+body.kira-mode #kira-overlay .mt-icon {
+  display: none;
+}
+
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .multitool-nav {
+    min-height: 70px;
+    padding: 6px 8px;
+  }
+  body.kira-mode #kira-overlay .multitool-item {
+    height: 58px;
+  }
+  body.kira-mode #kira-overlay .mt-svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* Spacing adjustment for mini-app: move diary content down, keep bottom dock closer */
+body.kira-mode #kira-overlay .hero-scene {
+  padding-top: calc(env(safe-area-inset-top) + 76px);
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
+}
+
+body.kira-mode #kira-overlay .topbar {
+  margin-bottom: 18px;
+}
+
+body.kira-mode #kira-overlay .multitool-nav {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .hero-scene {
+    padding-top: calc(env(safe-area-inset-top) + 58px);
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+
+  body.kira-mode #kira-overlay .topbar {
+    margin-bottom: 12px;
+  }
+
+  body.kira-mode #kira-overlay .multitool-nav {
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+}
+
+@media (min-height: 820px) {
+  body.kira-mode #kira-overlay .hero-scene {
+    padding-top: calc(env(safe-area-inset-top) + 88px);
+  }
+}
+
+/* Averox-inspired typography from provided reference */
+@font-face {
+  font-family: "Averox";
+  src: url("./fonts/averox.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+body.kira-mode #kira-overlay {
+  font-family: "Averox", "Roobert", Inter, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .015em;
+}
+
+body.kira-mode #kira-overlay h1,
+body.kira-mode #kira-overlay .score,
+body.kira-mode #kira-overlay .tile strong,
+body.kira-mode #kira-overlay .month-head strong {
+  font-family: "Averox", "Roobert", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: .015em;
+}
+
+body.kira-mode #kira-overlay .label,
+body.kira-mode #kira-overlay .tile p,
+body.kira-mode #kira-overlay .sync-pill,
+body.kira-mode #kira-overlay .score-pill,
+body.kira-mode #kira-overlay .month-head span,
+body.kira-mode #kira-overlay .multitool-item {
+  font-family: "Averox", "Roobert", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body.kira-mode #kira-overlay h1 {
+  font-size: clamp(42px, 12vw, 54px);
+}
+
+body.kira-mode #kira-overlay .score {
+  font-size: clamp(82px, 24vw, 108px);
+}
+
+/* Clean futuristic font replacement: no demo/watermark glyphs */
+@import url('https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;500;600;700&display=swap');
+
+body.kira-mode #kira-overlay {
+  font-family: "Orbitron", "Michroma", "Roobert", Inter, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .01em;
+}
+
+body.kira-mode #kira-overlay h1,
+body.kira-mode #kira-overlay .score,
+body.kira-mode #kira-overlay .tile strong,
+body.kira-mode #kira-overlay .month-head strong {
+  font-family: "Michroma", "Orbitron", "Roobert", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: .02em;
+}
+
+body.kira-mode #kira-overlay .label,
+body.kira-mode #kira-overlay .tile p,
+body.kira-mode #kira-overlay .sync-pill,
+body.kira-mode #kira-overlay .score-pill,
+body.kira-mode #kira-overlay .month-head span,
+body.kira-mode #kira-overlay .multitool-item {
+  font-family: "Orbitron", "Michroma", "Roobert", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body.kira-mode #kira-overlay h1 {
+  font-size: clamp(38px, 10.5vw, 50px);
+}
+
+body.kira-mode #kira-overlay .score {
+  font-size: clamp(76px, 22vw, 100px);
+}
+
+body.kira-mode #kira-overlay .tile strong {
+  font-size: 20px;
+}
+
+body.kira-mode #kira-overlay .month-head strong {
+  font-size: 20px;
+}
+
+/* Kira Diary functional tabs + Health calendar + daily word */
+body.kira-mode #kira-overlay .screen-subtitle {
+  margin: 5px 0 0;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.46);
+  max-width: 210px;
+  overflow-wrap: anywhere;
+}
+
+body.kira-mode #kira-overlay .kira-screen {
+  display: none;
+  position: relative;
+  z-index: 3;
+}
+body.kira-mode #kira-overlay .kira-screen.is-active { display: block; }
+body.kira-mode #kira-overlay .insight-text {
+  margin: 8px 0 0;
+  max-width: 300px;
+  color: rgba(255,255,255,.62);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+body.kira-mode #kira-overlay .word-tile { cursor: pointer; }
+body.kira-mode #kira-overlay .word-tile small {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.46);
+  font-size: 10px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.kira-mode #kira-overlay .icon-word {
+  width: 27px;
+  height: 27px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,.9);
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+}
+
+body.kira-mode #kira-overlay .health-card,
+body.kira-mode #kira-overlay .health-detail,
+body.kira-mode #kira-overlay .stat-card {
+  position: relative;
+  z-index: 3;
+  padding: 18px;
+  border-radius: 24px;
+  margin-top: 14px;
+  min-width: 0;
+  overflow: hidden;
+}
+body.kira-mode #kira-overlay .health-card { margin-top: 0; }
+body.kira-mode #kira-overlay .health-weekdays,
+body.kira-mode #kira-overlay .health-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+body.kira-mode #kira-overlay .health-weekdays {
+  margin: 16px 0 8px;
+  color: rgba(255,255,255,.42);
+  font-size: 9px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+body.kira-mode #kira-overlay .health-day,
+body.kira-mode #kira-overlay .cal-spacer {
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 0;
+}
+body.kira-mode #kira-overlay .health-day {
+  position: relative;
+  border-radius: 12px;
+  color: rgba(255,255,255,.76);
+  background: rgba(255,255,255,.055);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+body.kira-mode #kira-overlay .health-day b { position: relative; z-index: 2; font-weight: 700; }
+body.kira-mode #kira-overlay .health-day i {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: #ead37a;
+  box-shadow: 0 0 10px rgba(234,211,122,.7);
+}
+body.kira-mode #kira-overlay .health-day.has-entry { color: #fff; }
+body.kira-mode #kira-overlay .health-day.mood-calm,
+body.kira-mode #kira-overlay .health-day.mood-steady { background: rgba(124, 196, 143, .20); }
+body.kira-mode #kira-overlay .health-day.mood-tired { background: rgba(123, 151, 197, .20); }
+body.kira-mode #kira-overlay .health-day.mood-mixed { background: rgba(234, 191, 92, .20); }
+body.kira-mode #kira-overlay .health-day.selected {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.36), 0 0 0 3px rgba(234,211,122,.18);
+}
+body.kira-mode #kira-overlay .health-detail strong,
+body.kira-mode #kira-overlay .stat-card strong {
+  display: block;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1.05;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+body.kira-mode #kira-overlay .health-detail span,
+body.kira-mode #kira-overlay .stat-card span,
+body.kira-mode #kira-overlay .plain-text {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255,255,255,.58);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+body.kira-mode #kira-overlay .stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+body.kira-mode #kira-overlay .stat-card { margin-top: 0; min-height: 104px; }
+body.kira-mode #kira-overlay .stat-card p {
+  margin: 0;
+  color: rgba(255,255,255,.42);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+body.kira-mode #kira-overlay .stat-card strong { font-size: 15px; }
+body.kira-mode #kira-overlay .stat-card span { font-size: 11px; }
+body.kira-mode #kira-overlay .agent-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  min-width: 0;
+}
+body.kira-mode #kira-overlay .agent-flow span {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.075);
+  color: rgba(255,255,255,.72);
+  font-size: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.kira-mode #kira-overlay .agent-flow i {
+  width: 12px;
+  height: 1px;
+  flex: 0 0 auto;
+  background: rgba(255,255,255,.25);
+}
+body.kira-mode #kira-overlay .word-popover {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: end center;
+  padding: 18px 16px calc(env(safe-area-inset-bottom) + 18px);
+  background: rgba(0,0,0,.34);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+body.kira-mode #kira-overlay .word-popover[hidden] { display: none; }
+body.kira-mode #kira-overlay .word-card {
+  width: min(390px, 100%);
+  padding: 22px;
+  border-radius: 28px;
+  position: relative;
+}
+body.kira-mode #kira-overlay .word-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 34px;
+  line-height: .95;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+body.kira-mode #kira-overlay .word-card > span {
+  display: block;
+  margin-top: 6px;
+  color: #ead37a;
+  font-size: 14px;
+}
+body.kira-mode #kira-overlay .word-card p:last-child {
+  margin: 14px 0 0;
+  color: rgba(255,255,255,.68);
+  font-size: 13px;
+  line-height: 1.45;
+}
+body.kira-mode #kira-overlay .word-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255,255,255,.1);
+  font-size: 22px;
+}
+body.kira-mode #kira-overlay .multitool-item span { white-space: nowrap; }
+
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .health-card,
+  body.kira-mode #kira-overlay .health-detail,
+  body.kira-mode #kira-overlay .stat-card { padding: 14px; border-radius: 21px; }
+  body.kira-mode #kira-overlay .health-weekdays,
+  body.kira-mode #kira-overlay .health-calendar { gap: 5px; }
+  body.kira-mode #kira-overlay .health-day { border-radius: 10px; font-size: 10px; }
+  body.kira-mode #kira-overlay .stats-grid { gap: 10px; margin-top: 10px; }
+  body.kira-mode #kira-overlay .stat-card { min-height: 88px; }
+}
+
+@media (max-width: 370px) {
+  body.kira-mode #kira-overlay .stats-grid { grid-template-columns: 1fr; }
+  body.kira-mode #kira-overlay .screen-subtitle { max-width: 170px; }
+  body.kira-mode #kira-overlay .agent-flow { gap: 5px; }
+  body.kira-mode #kira-overlay .agent-flow span { font-size: 9px; padding-left: 5px; padding-right: 5px; }
+}
+
+/* Tight QA fix: daily word tile must not clip translation */
+body.kira-mode #kira-overlay .word-tile {
+  min-height: 104px;
+  height: auto;
+}
+body.kira-mode #kira-overlay .word-tile p {
+  margin-top: 20px;
+}
+body.kira-mode #kira-overlay .word-tile strong {
+  font-size: 18px;
+  line-height: 1.05;
+}
+body.kira-mode #kira-overlay .word-tile small {
+  max-width: 100%;
+}
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .word-tile {
+    min-height: 96px;
+  }
+  body.kira-mode #kira-overlay .word-tile p {
+    margin-top: 18px;
+  }
+}
+
+/* Empty RU diary + fixed bottom nav + real scroll */
+body.kira-mode #kira-overlay.phone-frame {
+  position: fixed;
+  inset: 0;
+  width: min(430px, 100vw);
+  min-height: 100dvh;
+  height: 100dvh;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: hidden;
+}
+body.kira-mode #kira-overlay .hero-scene {
+  min-height: 100dvh;
+  height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+}
+body.kira-mode #kira-overlay .kira-scroll {
+  position: relative;
+  z-index: 3;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(env(safe-area-inset-top) + 76px) 18px calc(env(safe-area-inset-bottom) + 120px);
+  scrollbar-width: none;
+}
+body.kira-mode #kira-overlay .kira-scroll::-webkit-scrollbar { display: none; }
+body.kira-mode #kira-overlay .topbar,
+body.kira-mode #kira-overlay .score-card,
+body.kira-mode #kira-overlay .quick-grid,
+body.kira-mode #kira-overlay .month-card { position: relative; z-index: 3; }
+body.kira-mode #kira-overlay .sync-pill { display: none !important; }
+body.kira-mode #kira-overlay .screen-subtitle {
+  margin: 5px 0 0;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.46);
+  max-width: 240px;
+}
+body.kira-mode #kira-overlay .kira-screen { display: none; position: relative; z-index: 3; }
+body.kira-mode #kira-overlay .kira-screen.is-active { display: block; }
+body.kira-mode #kira-overlay .empty-score { opacity: .7; }
+body.kira-mode #kira-overlay .insight-text,
+body.kira-mode #kira-overlay .plain-text {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.62);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+body.kira-mode #kira-overlay .word-tile { cursor: pointer; min-height: 104px; height: auto; }
+body.kira-mode #kira-overlay .word-tile p { margin-top: 20px; }
+body.kira-mode #kira-overlay .word-tile strong { font-size: 18px; line-height: 1.05; }
+body.kira-mode #kira-overlay .word-tile small {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.48);
+  font-size: 10px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.kira-mode #kira-overlay .icon-word {
+  width: 27px;
+  height: 27px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,.9);
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+}
+body.kira-mode #kira-overlay .real-month-dots {
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px 13px;
+}
+body.kira-mode #kira-overlay .real-month-dots i.filled {
+  background: #ead37a;
+  box-shadow: 0 0 14px rgba(234,211,122,.7);
+}
+body.kira-mode #kira-overlay .health-card,
+body.kira-mode #kira-overlay .health-detail,
+body.kira-mode #kira-overlay .stat-card {
+  position: relative;
+  z-index: 3;
+  padding: 18px;
+  border-radius: 24px;
+  margin-top: 14px;
+  min-width: 0;
+  overflow: hidden;
+}
+body.kira-mode #kira-overlay .health-card { margin-top: 0; }
+body.kira-mode #kira-overlay .health-weekdays,
+body.kira-mode #kira-overlay .health-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+body.kira-mode #kira-overlay .health-weekdays {
+  margin: 16px 0 8px;
+  color: rgba(255,255,255,.42);
+  font-size: 9px;
+  text-align: center;
+  text-transform: uppercase;
+}
+body.kira-mode #kira-overlay .health-day,
+body.kira-mode #kira-overlay .cal-spacer { aspect-ratio: 1; min-width: 0; border: 0; }
+body.kira-mode #kira-overlay .health-day {
+  position: relative;
+  border-radius: 12px;
+  color: rgba(255,255,255,.72);
+  background: rgba(255,255,255,.055);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+body.kira-mode #kira-overlay .health-day i {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: #ead37a;
+}
+body.kira-mode #kira-overlay .health-day.has-entry { color: #fff; background: rgba(255,255,255,.075); }
+body.kira-mode #kira-overlay .health-day.selected { box-shadow: inset 0 0 0 1px rgba(255,255,255,.36), 0 0 0 3px rgba(234,211,122,.18); }
+body.kira-mode #kira-overlay .health-detail strong,
+body.kira-mode #kira-overlay .stat-card strong { display:block; color:#fff; font-size:20px; line-height:1.05; margin-top:4px; }
+body.kira-mode #kira-overlay .health-detail span,
+body.kira-mode #kira-overlay .stat-card span { display:block; margin-top:8px; color:rgba(255,255,255,.58); font-size:12px; line-height:1.45; }
+body.kira-mode #kira-overlay .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+body.kira-mode #kira-overlay .stat-card { margin-top:0; min-height:104px; }
+body.kira-mode #kira-overlay .stat-card p { margin:0; color:rgba(255,255,255,.42); font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+body.kira-mode #kira-overlay .stat-card strong { font-size:15px; }
+body.kira-mode #kira-overlay .stat-card span { font-size:11px; }
+body.kira-mode #kira-overlay .agent-flow { display:flex; align-items:center; gap:8px; margin-top:14px; }
+body.kira-mode #kira-overlay .agent-flow span { flex:1; min-width:0; padding:9px 8px; border-radius:999px; background:rgba(255,255,255,.075); color:rgba(255,255,255,.72); font-size:10px; text-align:center; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; }
+body.kira-mode #kira-overlay .agent-flow i { width:12px; height:1px; flex:0 0 auto; background:rgba(255,255,255,.25); }
+body.kira-mode #kira-overlay .multitool-nav {
+  position: fixed !important;
+  left: 18px;
+  right: 18px;
+  bottom: calc(env(safe-area-inset-bottom) + 14px);
+  z-index: 40;
+  margin: 0 auto !important;
+  width: auto;
+  max-width: 394px;
+}
+body.kira-mode #kira-overlay .multitool-item span { white-space: nowrap; font-size: 10px; }
+body.kira-mode #kira-overlay .word-popover { position:fixed; inset:0; z-index:50; display:grid; place-items:end center; padding:18px 16px calc(env(safe-area-inset-bottom) + 18px); background:rgba(0,0,0,.34); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+body.kira-mode #kira-overlay .word-popover[hidden] { display:none; }
+body.kira-mode #kira-overlay .word-card { width:min(390px,100%); padding:22px; border-radius:28px; position:relative; }
+body.kira-mode #kira-overlay .word-card strong { display:block; margin-top:4px; font-size:34px; line-height:.95; color:#fff; text-transform:uppercase; letter-spacing:.04em; }
+body.kira-mode #kira-overlay .word-card > span { display:block; margin-top:6px; color:#ead37a; font-size:14px; }
+body.kira-mode #kira-overlay .word-card p:last-child { margin:14px 0 0; color:rgba(255,255,255,.68); font-size:13px; line-height:1.45; }
+body.kira-mode #kira-overlay .word-close { position:absolute; top:12px; right:12px; width:34px; height:34px; border:0; border-radius:50%; color:#fff; background:rgba(255,255,255,.1); font-size:22px; }
+
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .kira-scroll { padding-top: calc(env(safe-area-inset-top) + 58px); padding-bottom: calc(env(safe-area-inset-bottom) + 108px); }
+  body.kira-mode #kira-overlay .health-card,
+  body.kira-mode #kira-overlay .health-detail,
+  body.kira-mode #kira-overlay .stat-card { padding:14px; border-radius:21px; }
+  body.kira-mode #kira-overlay .stat-card { min-height:88px; }
+}
+@media (max-width: 370px) {
+  body.kira-mode #kira-overlay .kira-scroll { padding-left:14px; padding-right:14px; }
+  body.kira-mode #kira-overlay .stats-grid { grid-template-columns:1fr; }
+  body.kira-mode #kira-overlay .multitool-nav { left: 12px; right: 12px; }
+}
+
+/* Weather + top title cleanup */
+body.kira-mode #kira-overlay .topbar {
+  margin-bottom: 12px;
+}
+body.kira-mode #kira-overlay .topbar h1[hidden] {
+  display: none !important;
+}
+body.kira-mode #kira-overlay .screen-subtitle {
+  margin-top: 0;
+}
+body.kira-mode #kira-overlay .weather-main {
+  margin-top: 8px;
+  font-family: "Michroma", "Orbitron", "Roobert", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(52px, 15vw, 70px);
+  line-height: .95;
+  letter-spacing: .01em;
+  color: #fff;
+}
+body.kira-mode #kira-overlay .weather-meta {
+  margin-top: 8px;
+  max-width: 230px;
+  color: rgba(255,255,255,.62);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+body.kira-mode #kira-overlay .weather-pill {
+  white-space: nowrap;
+}
+body.kira-mode #kira-overlay .word-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-top: 48px;
+}
+body.kira-mode #kira-overlay .word-tile .icon-word {
+  top: 13px;
+  left: 13px;
+  width: 23px;
+  height: 23px;
+  border-radius: 8px;
+  font-size: 9px;
+  line-height: 1;
+}
+body.kira-mode #kira-overlay .word-tile p {
+  display: none !important;
+}
+body.kira-mode #kira-overlay .word-tile strong {
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  font-size: 17px;
+  line-height: 1.05;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.kira-mode #kira-overlay .word-tile small {
+  margin-top: 0;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .weather-main { font-size: clamp(44px, 13vw, 60px); }
+  body.kira-mode #kira-overlay .weather-meta { font-size: 11px; }
+  body.kira-mode #kira-overlay .word-tile { padding-top: 42px; }
 }
