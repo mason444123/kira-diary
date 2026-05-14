@@ -1128,7 +1128,7 @@ body.kira-mode #kira-overlay .kira-scroll {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: calc(env(safe-area-inset-top) + 76px) 18px calc(env(safe-area-inset-bottom) + 120px);
+  padding: calc(env(safe-area-inset-top) + 96px) 18px calc(env(safe-area-inset-bottom) + 120px);
   scrollbar-width: none;
 }
 body.kira-mode #kira-overlay .kira-scroll::-webkit-scrollbar { display: none; }
@@ -1273,7 +1273,7 @@ body.kira-mode #kira-overlay .word-card p:last-child { margin:14px 0 0; color:rg
 body.kira-mode #kira-overlay .word-close { position:absolute; top:12px; right:12px; width:34px; height:34px; border:0; border-radius:50%; color:#fff; background:rgba(255,255,255,.1); font-size:22px; }
 
 @media (max-height: 760px) {
-  body.kira-mode #kira-overlay .kira-scroll { padding-top: calc(env(safe-area-inset-top) + 58px); padding-bottom: calc(env(safe-area-inset-bottom) + 108px); }
+  body.kira-mode #kira-overlay .kira-scroll { padding-top: calc(env(safe-area-inset-top) + 78px); padding-bottom: calc(env(safe-area-inset-bottom) + 108px); }
   body.kira-mode #kira-overlay .health-card,
   body.kira-mode #kira-overlay .health-detail,
   body.kira-mode #kira-overlay .stat-card { padding:14px; border-radius:21px; }
