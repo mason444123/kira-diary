@@ -47,13 +47,13 @@
       "productivity": "полезная работа вечером несмотря на тяжёлое утро"
     },
     "money": {
-      "income": [{ "amount": 1000, "currency": "RUB", "source": "поддержка" }],
+      "income": [{"amount": 1000, "currency": "RUB", "source": "поддержка"}],
       "expenses": [
-        { "amount": null, "currency": "RUB", "category": "интернет" },
-        { "amount": null, "currency": "RUB", "category": "еда" }
+        {"amount": null, "currency": "RUB", "category": "интернет"},
+        {"amount": null, "currency": "RUB", "category": "еда"}
       ],
-      "debts": [{ "amount": 300, "currency": "RUB", "type": "возврат долга" }],
-      "loans": [{ "amount": 3000, "currency": "RUB", "type": "микрозайм" }],
+      "debts": [{"amount": 300, "currency": "RUB", "type": "возврат долга"}],
+      "loans": [{"amount": 3000, "currency": "RUB", "type": "микрозайм"}],
       "balance_notes": ["денег на платную клинику нет"]
     },
     "needs": ["больница", "анализы", "деньги на платную клинику", "еда", "интернет", "отдых"],
@@ -69,6 +69,64 @@
       "health_detail": "Недосып 05:00–11:00, тревожный звонок бабушки, больница, нужные анализы не дали.",
       "stress": "высокий утром, ниже вечером",
       "what_helps": "еда, интернет, завершение сайта, поддержка"
+    }
+  },
+  "2026-05-15": {
+    "date": "2026-05-15",
+    "logged": true,
+    "raw_transcript": "не помню когда проснулся день ничем особо не запомнился кроме того что я приготовил покушать, но еда была протухшая и пришлось выкинуть, а ещё поставил гермес агент на компьютер это было интересным опытом, в основном ничего больше не помню",
+    "kira_score": 45,
+    "sleep": {
+      "sleep_time": null,
+      "wake_time": null,
+      "duration_hours": null,
+      "quality": null
+    },
+    "state": {
+      "mood_morning": null,
+      "mood_day": "neutral",
+      "mood_evening": null,
+      "mood_now": null,
+      "energy": null,
+      "stress": null,
+      "anxiety": null,
+      "body": null
+    },
+    "events": [
+      "Приготовление еды (протухшая, выкинута)",
+      "Установка Hermes Agent на компьютер"
+    ],
+    "health": {
+      "symptoms": [],
+      "doctor": [],
+      "medicine": [],
+      "analysis": [],
+      "notes": []
+    },
+    "work": {
+      "done": [
+        "Установка Hermes Agent"
+      ],
+      "main_useful_action": "Установка Hermes Agent — интересный опыт",
+      "productivity": null
+    },
+    "money": {
+      "income": [],
+      "expenses": [],
+      "debts": [],
+      "loans": [],
+      "balance_notes": []
+    },
+    "needs": [],
+    "tomorrow": [],
+    "site_blocks": {
+      "mood": "нейтральное",
+      "energy": null,
+      "needed": null,
+      "month_status": null,
+      "health_detail": "День без особых событий",
+      "stress": null,
+      "what_helps": "Установка нового ПО"
     }
   }
 }
