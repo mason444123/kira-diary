@@ -330,5 +330,82 @@
       "energy_score": 6,
       "needed_score": 4
     }
+  },
+  "2026-05-18": {
+    "date": "2026-05-18",
+    "logged": true,
+    "raw_transcript": "Не вникна сегодня, какое-то 18-го часа вроде бы, а чем, ну, поспал я вроде бы нормально, что все его 8 было, но установил очень поздно, проснулся однём, проснулся в очень важном стыне, не было очень плохо, потом отходил очень много времени до этого в стыне, под вечер я собрался и пошёл за продуктами, мы побочаются, купила эту экспоненту, её горто протеиновый, там 30 грамбелка, как обещал себе, что буду пить больше этого, чтобы бекобуду потреблять тщения, вот, особо ничего не делал сегодня, может, если получился парсер сделан, вот, пришёл, нашёл в IP, дешёвые для кауткоды, очень классно, вроде бы всё, ещё подетерковательно разболёлось, завтра крысовки придут мои для бега, если получится, буду бегать чаще, ну вообще начну бегать,",
+    "kira_score": 5.2,
+    "sleep": {
+      "sleep_time": "late",
+      "wake_time": null,
+      "duration_hours": 8,
+      "quality": "normal"
+    },
+    "state": {
+      "mood_morning": null,
+      "mood_day": null,
+      "mood_evening": "better",
+      "mood_now": null,
+      "energy": "low",
+      "stress": "some",
+      "anxiety": null,
+      "body": "body ache"
+    },
+    "events": [
+      "Late install and woke up at noon.",
+      "Went to buy groceries in the evening.",
+      "Bought protein drink with 30g protein.",
+      "Found cheap products for the parser/code tasks.",
+      "Joints/legs ached a bit.",
+      "Running shoes should arrive tomorrow; plans to start running more often."
+    ],
+    "health": {
+      "symptoms": [
+        "body ache"
+      ],
+      "doctor": [],
+      "medicine": [],
+      "analysis": [],
+      "notes": [
+        "Trying to drink more protein to meet intake."
+      ]
+    },
+    "work": {
+      "done": [
+        "Made some progress on the parser.",
+        "Found inexpensive items for code/parser work."
+      ],
+      "main_useful_action": "Some parser progress and practical purchases.",
+      "productivity": "low-medium"
+    },
+    "money": {
+      "income": [],
+      "expenses": [
+        "groceries",
+        "protein drink"
+      ],
+      "debts": [],
+      "loans": [],
+      "balance_notes": []
+    },
+    "needs": [
+      "More protein intake",
+      "Run more often"
+    ],
+    "tomorrow": [
+      "Wait for running shoes",
+      "Try to go running",
+      "Continue parser if possible"
+    ],
+    "site_blocks": {
+      "mood": "so-so",
+      "energy": "low",
+      "needed": "protein, running",
+      "month_status": null,
+      "health_detail": "body/joint ache after a long day",
+      "stress": "some",
+      "what_helps": "go running, keep routine"
+    }
   }
 }
