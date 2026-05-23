@@ -273,6 +273,7 @@
   }
 
   async function mountOverlay() {
+    document.title = 'Kira Diary';
     document.querySelectorAll('#kira-overlay').forEach((node) => node.remove());
     document.body.insertAdjacentHTML('beforeend', overlayHtml);
     document.body.classList.add('kira-mode');
@@ -348,6 +349,6 @@
     };
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(mountOverlay, 900));
-  else setTimeout(mountOverlay, 900);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountOverlay);
+  else mountOverlay();
 })();
