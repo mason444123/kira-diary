@@ -65,6 +65,7 @@
     <main id="kira-overlay" class="phone-frame" aria-label="Дневник">
       <section class="hero-scene">
         <div class="grain"></div>
+        <div class="liquid-object kira-bg-orb" aria-hidden="true"><span class="liquid-core"></span><span class="liquid-rim"></span><span class="liquid-glare"></span></div>
         <div class="kira-scroll">
           <header class="topbar">
             <div>

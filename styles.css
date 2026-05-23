@@ -53,8 +53,6 @@ body {
   background: #000;
   pointer-events: none;
   overflow: hidden;
-  opacity: 0;
-  visibility: hidden;
 }
 
 .phone-frame {
@@ -398,8 +396,6 @@ body.kira-mode #__nuxt {
   pointer-events: none !important;
   overflow: hidden !important;
   background: #000 !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
 }
 
 body.kira-mode #__nuxt canvas,
@@ -420,7 +416,9 @@ body.kira-mode #__nuxt p,
 body.kira-mode #__nuxt h1,
 body.kira-mode #__nuxt h2,
 body.kira-mode #__nuxt h3,
-body.kira-mode #__nuxt span {
+body.kira-mode #__nuxt span,
+body.kira-mode #__nuxt #loader,
+body.kira-mode #__nuxt .text-container {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -451,6 +449,14 @@ body.kira-mode #kira-overlay .grain {
   opacity: .12;
   pointer-events: none;
   z-index: 1;
+}
+
+body.kira-mode #kira-overlay .kira-bg-orb {
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  top: -34px;
+  transform: translateX(-51%) rotate(-13deg);
 }
 
 body.kira-mode #kira-overlay .glass {
