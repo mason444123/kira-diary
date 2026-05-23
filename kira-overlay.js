@@ -106,17 +106,17 @@
               <div class="health-calendar" data-health-calendar></div>
             </section>
 
-            <section class="health-detail glass" data-health-detail>
-              <p class="label">День</p>
-              <strong>Нет данных</strong>
-              <span>Когда появится запись, здесь будут настроение, энергия, сон и заметка за выбранный день.</span>
-            </section>
-
-            <section class="stats-grid" data-health-stats>
+            <section class="stats-grid health-summary-grid" data-health-stats>
               <article class="glass stat-card" data-health-stat="mood"><p>Настроение</p><strong>—</strong><span>Появится после записей.</span></article>
               <article class="glass stat-card" data-health-stat="sleep-energy"><p>Сон → энергия</p><strong>—</strong><span>Нужно больше данных.</span></article>
               <article class="glass stat-card" data-health-stat="stress"><p>Стресс</p><strong>—</strong><span>Пока паттернов нет.</span></article>
               <article class="glass stat-card" data-health-stat="helps"><p>Что помогает</p><strong>—</strong><span>Кира найдёт повторяющиеся опоры.</span></article>
+            </section>
+
+            <section class="health-detail glass diary-text-card" data-health-detail>
+              <p class="label">День</p>
+              <strong>Нет данных</strong>
+              <span>Когда появится запись, здесь будет дневниковый текст выбранного дня.</span>
             </section>
           </section>
 
@@ -188,20 +188,19 @@
   }
 
 
+  function diaryText(entry) {
+    return entry?.diary_text || entry?.edited_text || entry?.raw_transcript || site(entry, 'health_detail', 'Данные сохранены.');
+  }
+
   function renderEntryDetail(detail, entry, date) {
     if (!entry) {
       detail.innerHTML = `<p class="label">${date}</p><strong>Нет записи</strong><span>Этот день пока пустой.</span>`;
       return;
     }
-    const score = entry.kira_score ?? entry.score;
     detail.innerHTML = `
       <p class="label">${escapeHtml(date)}</p>
       <strong>${escapeHtml(site(entry, 'mood', 'Запись есть'))}</strong>
-      <span>${escapeHtml(site(entry, 'health_detail', entry.raw_transcript || 'Данные сохранены.'))}</span>
-      <span>Энергия: ${escapeHtml(site(entry, 'energy'))}</span>
-      <span>Стресс: ${escapeHtml(site(entry, 'stress'))}</span>
-      <span>Нужно: ${escapeHtml(site(entry, 'needed'))}</span>
-      <span>${score == null ? 'Kira Score: —' : `Kira Score: ${escapeHtml(score)}`}</span>`;
+      <span>${escapeHtml(diaryText(entry))}</span>`;
   }
 
   function setHealthStat(overlay, key, value, note) {
@@ -229,20 +228,27 @@
   }
 
   function renderHealthStats(overlay, entry) {
+    const statsRoot = overlay.querySelector('[data-health-stats]');
     if (!entry) {
+      if (statsRoot) statsRoot.classList.add('is-empty');
       setHealthStat(overlay, 'mood', '—', 'Появится после записей.');
       setHealthStat(overlay, 'sleep-energy', '—', 'Нужно больше данных.');
       setHealthStat(overlay, 'stress', '—', 'Пока паттернов нет.');
       setHealthStat(overlay, 'helps', '—', 'Кира найдёт повторяющиеся опоры.');
       return;
     }
+    if (statsRoot) statsRoot.classList.remove('is-empty');
 
     const score = entry.kira_score ?? entry.score;
     const sleep = entry.sleep || {};
     const siteBlocks = entry.site_blocks || {};
     const moodValue = siteBlocks.mood_score || (score == null ? '—' : String(score));
     const moodNote = siteBlocks.mood || [entry.state?.mood_morning, entry.state?.mood_evening].filter(Boolean).join(' → ') || 'Настроение сохранено.';
-    const sleepValue = sleep.duration_hours ? `${sleep.duration_hours}ч / ${siteBlocks.energy_score || '—'}` : (siteBlocks.energy_score || '—');
+    const sleepDuration = sleep.duration_hours;
+    const sleepLabel = sleepDuration
+      ? (/^\d+(\.\d+)?$/.test(String(sleepDuration)) ? `${sleepDuration}ч` : String(sleepDuration))
+      : '';
+    const sleepValue = sleepLabel ? `${sleepLabel} / ${siteBlocks.energy_score || '—'}` : (siteBlocks.energy_score || '—');
     const sleepNote = [sleep.sleep_time && sleep.wake_time ? `${sleep.sleep_time}–${sleep.wake_time}` : '', siteBlocks.energy || sleep.quality || ''].filter(Boolean).join(' · ') || 'Нет данных по сну.';
     const stressNote = siteBlocks.stress || entry.state?.stress || 'Нет данных по стрессу.';
     const helps = siteBlocks.what_helps || '';
