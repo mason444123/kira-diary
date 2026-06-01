@@ -1643,6 +1643,63 @@ body.kira-mode #kira-overlay .dot-calendar i {
   }
 }
 
+
+/* Fix compact mood/energy cards alignment */
+body.kira-mode #kira-overlay .daily-pair {
+  align-items: stretch;
+}
+body.kira-mode #kira-overlay .compact-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 96px;
+  min-height: 96px;
+  padding: 14px 15px 15px;
+}
+body.kira-mode #kira-overlay .compact-tile .tile-icon {
+  top: 15px;
+  left: 15px;
+}
+body.kira-mode #kira-overlay .compact-tile p {
+  margin: 0 0 7px;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.05;
+}
+body.kira-mode #kira-overlay .compact-tile strong {
+  display: block;
+  line-height: .95;
+  margin: 0;
+  padding: 0;
+}
+@media (max-height: 900px) and (max-width: 430px) {
+  body.kira-mode #kira-overlay .compact-tile {
+    height: 88px;
+    min-height: 88px;
+    padding: 13px 13px 14px;
+  }
+  body.kira-mode #kira-overlay .compact-tile .tile-icon {
+    top: 13px;
+    left: 13px;
+  }
+  body.kira-mode #kira-overlay .compact-tile p {
+    margin: 0 0 6px;
+    font-size: 9px;
+    letter-spacing: .1em;
+  }
+  body.kira-mode #kira-overlay .compact-tile strong {
+    font-size: 20px;
+  }
+  body.kira-mode #kira-overlay .habit-orbs {
+    margin-top: 12px;
+  }
+  body.kira-mode #kira-overlay .month-card {
+    min-height: 188px;
+  }
+}
+
 /* Weather + top title cleanup */
 body.kira-mode #kira-overlay .topbar {
   margin-bottom: 12px;
