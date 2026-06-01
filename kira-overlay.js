@@ -63,14 +63,14 @@
   const MONTH_STORAGE_KEY = 'kiraDiary.visibleMonth';
   const HABIT_STORAGE_KEY = 'kiraDiary.habits.v1';
   const habitDefs = [
-    { id: 'supplements', label: 'Выпил добавки', icon: 'supplements' },
-    { id: 'gym', label: 'Сходил в зал', icon: 'training' },
-    { id: 'money', label: 'Заработал денег', icon: 'ruble' }
+    { id: 'supplements', label: 'Выпил БАД', text: 'БАД' },
+    { id: 'gym', label: 'Зал отмечен', text: 'Зал' },
+    { id: 'money', label: 'Деньги отмечены', text: 'Деньги' }
   ];
-  const habitIcons = {
-    supplements: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17.2 30.8 30.8 17.2a8.2 8.2 0 0 1 11.6 11.6L28.8 42.4a8.2 8.2 0 0 1-11.6-11.6Z"/><path d="M23.8 24.2 35 35.4"/><path d="M8 12.5h6.8M11.4 9.1v6.8M6.5 27h4.8"/></svg>',
-    training: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 21.5h6M35 21.5h6M13 17v14M35 17v14M17 24h14"/><path d="M18.5 13.5c1.6-3.2 3.7-4.9 5.5-4.9s3.9 1.7 5.5 4.9"/></svg>',
-    ruble: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M18 38V9h10.5c6.1 0 10.1 3.3 10.1 8.6 0 5.4-4 8.7-10.1 8.7H13"/><path d="M13 32h19"/><path d="M18 26.3V32"/></svg>'
+  const habitClassMap = {
+    supplements: 'habit-bad',
+    gym: 'habit-gym',
+    money: 'habit-money'
   };
 
   function saveVisibleMonth(state) {
@@ -122,7 +122,7 @@
             </section>
 
             <section class="habit-orbs" aria-label="Быстрые отметки дня">
-              ${habitDefs.map((habit) => `<button class="habit-orb" type="button" data-habit="${habit.id}" aria-label="${habit.label}"><span class="habit-orb__glow"></span><span class="habit-icon" aria-hidden="true">${habitIcons[habit.icon]}</span></button>`).join('')}
+              ${habitDefs.map((habit) => `<button class="habit-orb" type="button" data-habit="${habit.id}" aria-label="${habit.label}"><span class="habit-orb__glow"></span><span class="habit-text" aria-hidden="true">${habit.text}</span></button>`).join('')}
             </section>
 
             <section class="month-card glass">
@@ -199,9 +199,16 @@
   function renderMonthDots(root, y, m) {
     let html = '';
     const total = daysInMonth(y, m);
+    const habitState = readHabits();
     for (let d = 1; d <= total; d++) {
       const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      html += `<i class="${entryStore[k] ? 'filled' : 'empty'}"></i>`;
+      const entry = !!entryStore[k];
+      const habits = habitState[k] || {};
+      const habitClasses = Object.keys(habits)
+        .filter((id) => habits[id] && habitClassMap[id])
+        .map((id) => habitClassMap[id])
+        .join(' ');
+      html += `<i class="${entry ? 'filled' : 'empty'} ${habitClasses}" title="${k}"></i>`;
     }
     root.innerHTML = html;
   }
@@ -421,6 +428,7 @@
         btn.classList.add('is-popping');
         window.setTimeout(() => btn.classList.remove('is-popping'), 420);
         renderHabits();
+        renderMonthDots(dots, visibleMonth.y, visibleMonth.m);
       });
     });
     renderHabits();

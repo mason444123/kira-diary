@@ -1700,6 +1700,70 @@ body.kira-mode #kira-overlay .compact-tile strong {
   }
 }
 
+
+/* Habit text buttons + calendar markers */
+body.kira-mode #kira-overlay .compact-tile .icon-sleep {
+  transform: translateY(4px);
+}
+body.kira-mode #kira-overlay .habit-text {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  padding: 0 6px;
+  font-family: "Michroma", "Orbitron", Inter, sans-serif;
+  font-size: clamp(11px, 3vw, 15px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(255,255,255,.22);
+}
+body.kira-mode #kira-overlay .habit-orb[data-habit="money"] .habit-text {
+  font-size: clamp(9px, 2.45vw, 12px);
+  letter-spacing: .05em;
+}
+body.kira-mode #kira-overlay .dot-calendar i {
+  position: relative;
+  overflow: visible;
+}
+body.kira-mode #kira-overlay .dot-calendar i.habit-bad,
+body.kira-mode #kira-overlay .dot-calendar i.habit-gym,
+body.kira-mode #kira-overlay .dot-calendar i.habit-money {
+  opacity: 1;
+  background: rgba(234,211,122,.9);
+  box-shadow: 0 0 13px rgba(234,211,122,.58), inset 0 0 0 1px rgba(255,255,255,.18);
+}
+body.kira-mode #kira-overlay .dot-calendar i.habit-bad::before,
+body.kira-mode #kira-overlay .dot-calendar i.habit-gym::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  top: -4px;
+  box-shadow: 0 0 8px currentColor;
+}
+body.kira-mode #kira-overlay .dot-calendar i.habit-bad::before {
+  left: -3px;
+  color: #b6f0b5;
+  background: #b6f0b5;
+}
+body.kira-mode #kira-overlay .dot-calendar i.habit-gym::after {
+  right: -3px;
+  color: #b7d8ff;
+  background: #b7d8ff;
+}
+body.kira-mode #kira-overlay .dot-calendar i.habit-money {
+  outline: 2px solid rgba(255,224,118,.55);
+  outline-offset: 2px;
+}
+body.kira-mode #kira-overlay .dot-calendar i.habit-bad.habit-gym.habit-money {
+  background: linear-gradient(135deg, #b6f0b5 0 33%, #b7d8ff 33% 66%, #ead37a 66% 100%);
+}
+
 /* Weather + top title cleanup */
 body.kira-mode #kira-overlay .topbar {
   margin-bottom: 12px;
