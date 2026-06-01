@@ -60,6 +60,30 @@
   const now = new Date();
   const todayKey = dateKey(now);
   const todayWord = wordFor(todayKey);
+  const MONTH_STORAGE_KEY = 'kiraDiary.visibleMonth';
+  const HABIT_STORAGE_KEY = 'kiraDiary.habits.v1';
+  const habitDefs = [
+    { id: 'supplements', label: 'Выпил добавки', icon: 'pill' },
+    { id: 'gym', label: 'Сходил в зал', icon: 'gym' },
+    { id: 'money', label: 'Заработал денег', icon: 'money' }
+  ];
+
+  function saveVisibleMonth(state) {
+    try { localStorage.setItem(MONTH_STORAGE_KEY, JSON.stringify({ y: state.y, m: state.m })); } catch (_) {}
+  }
+  function readVisibleMonth() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(MONTH_STORAGE_KEY) || 'null');
+      if (saved && Number.isInteger(saved.y) && Number.isInteger(saved.m) && saved.m >= 0 && saved.m <= 11) return saved;
+    } catch (_) {}
+    return null;
+  }
+  function readHabits() {
+    try { return JSON.parse(localStorage.getItem(HABIT_STORAGE_KEY) || '{}') || {}; } catch (_) { return {}; }
+  }
+  function writeHabits(state) {
+    try { localStorage.setItem(HABIT_STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+  }
 
   const overlayHtml = `
     <main id="kira-overlay" class="phone-frame" aria-label="Дневник">
@@ -87,11 +111,8 @@
               <div class="wave is-empty"><span></span><span></span><span></span><i class="dot dot-l"></i><i class="dot dot-r"></i></div>
             </section>
 
-            <section class="quick-grid">
-              <article class="glass tile"><span class="tile-icon icon-wake"></span><p>Настроение</p><strong data-tile-mood>—</strong></article>
-              <article class="glass tile"><span class="tile-icon icon-sleep"></span><p>Энергия</p><strong data-tile-energy>—</strong></article>
-              <article class="glass tile selected"><span class="tile-icon icon-habit"></span><p>Нужно</p><strong data-tile-needed>—</strong></article>
-              <article class="glass tile word-tile" data-word-open><span class="tile-icon icon-word">Aa</span><strong>${todayWord.word}</strong><small>${todayWord.translation}</small></article>
+            <section class="habit-orbs" aria-label="Быстрые отметки дня">
+              ${habitDefs.map((habit) => `<button class="habit-orb" type="button" data-habit="${habit.id}" aria-label="${habit.label}"><span class="habit-orb__glow"></span><span class="habit-icon habit-icon-${habit.icon}" aria-hidden="true"></span></button>`).join('')}
             </section>
 
             <section class="month-card glass">
@@ -137,8 +158,6 @@
           <button class="multitool-item" type="button" aria-label="Кира" data-tab="kira"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-4 3-6 6.5-6s5.7 2 6.5 6"/></svg><span>Кира</span></button>
           <button class="multitool-item" type="button" aria-label="Система" data-tab="system"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 7.4v8.2l-7 4.9-7-4.9V7.4z"/><path d="M5.4 7.8 12 11.8l6.6-4"/><path d="M12 11.8v8.1"/></svg><span>Система</span></button>
         </nav>
-
-        <div class="word-popover" data-word-popover hidden><div class="word-card glass"><button class="word-close" type="button" data-word-close>×</button><p class="label">Слово дня</p><strong>${todayWord.word}</strong><span>${todayWord.translation}</span><p>${todayWord.example}</p></div></div>
       </section>
     </main>`;
 
@@ -271,9 +290,12 @@
     if (monthName) monthName.textContent = `${monthNames[m]} ${y}`;
     if (healthMonth) healthMonth.textContent = `${monthNames[m]} ${y} · календарь`;
     if (status) status.textContent = monthEntries.length ? `${monthEntries.length} записей` : 'Нет записей';
-    overlay.querySelector('[data-tile-mood]').textContent = site(todayEntry, 'mood_score', score == null ? '—' : String(score));
-    overlay.querySelector('[data-tile-energy]').textContent = site(todayEntry, 'energy_score', todayEntry?.state?.energy_score ?? '—');
-    overlay.querySelector('[data-tile-needed]').textContent = site(todayEntry, 'needed_score', todayEntry?.needs_score ?? '—');
+    const moodTile = overlay.querySelector('[data-tile-mood]');
+    const energyTile = overlay.querySelector('[data-tile-energy]');
+    const neededTile = overlay.querySelector('[data-tile-needed]');
+    if (moodTile) moodTile.textContent = site(todayEntry, 'mood_score', score == null ? '—' : String(score));
+    if (energyTile) energyTile.textContent = site(todayEntry, 'energy_score', todayEntry?.state?.energy_score ?? '—');
+    if (neededTile) neededTile.textContent = site(todayEntry, 'needed_score', todayEntry?.needs_score ?? '—');
     renderHealthStats(overlay, todayEntry);
   }
 
@@ -314,17 +336,19 @@
     const calendar = overlay.querySelector('[data-health-calendar]');
     const dots = overlay.querySelector('[data-month-dots]');
     const detail = overlay.querySelector('[data-health-detail]');
-    let visibleMonth = { y: now.getFullYear(), m: now.getMonth() };
+    let visibleMonth = readVisibleMonth() || { y: now.getFullYear(), m: now.getMonth() };
+    const habitState = readHabits();
 
     Object.assign(entryStore, await loadEntries());
     const todayEntryForHealth = entryStore[todayKey] || entryList().at(-1);
 
-    if (todayEntryForHealth) {
+    if (!readVisibleMonth() && todayEntryForHealth) {
       const entryDate = new Date(`${todayEntryForHealth.date}T00:00:00`);
       if (!Number.isNaN(entryDate.getTime())) {
         visibleMonth = { y: entryDate.getFullYear(), m: entryDate.getMonth() };
       }
     }
+    saveVisibleMonth(visibleMonth);
     renderVisibleMonth(overlay, calendar, dots, detail, visibleMonth, todayEntryForHealth?.date);
     updateWeather(overlay);
     setInterval(() => updateWeather(overlay), 10 * 60 * 1000);
@@ -350,12 +374,14 @@
     overlay.querySelectorAll('[data-month-prev], [data-health-prev]').forEach((btn) => {
       btn.addEventListener('click', () => {
         visibleMonth = addMonths(visibleMonth.y, visibleMonth.m, -1);
+        saveVisibleMonth(visibleMonth);
         renderVisibleMonth(overlay, calendar, dots, detail, visibleMonth);
       });
     });
     overlay.querySelectorAll('[data-month-next], [data-health-next]').forEach((btn) => {
       btn.addEventListener('click', () => {
         visibleMonth = addMonths(visibleMonth.y, visibleMonth.m, 1);
+        saveVisibleMonth(visibleMonth);
         renderVisibleMonth(overlay, calendar, dots, detail, visibleMonth);
       });
     });
@@ -370,10 +396,30 @@
       renderHealthStats(overlay, selectedEntry);
     });
 
-    const pop = overlay.querySelector('[data-word-popover]');
-    overlay.querySelector('[data-word-open]').addEventListener('click', () => { pop.hidden = false; });
-    overlay.querySelector('[data-word-close]').addEventListener('click', () => { pop.hidden = true; });
-    pop.addEventListener('click', (e) => { if (e.target === pop) pop.hidden = true; });
+    function renderHabits() {
+      overlay.querySelectorAll('[data-habit]').forEach((btn) => {
+        const active = !!habitState?.[todayKey]?.[btn.dataset.habit];
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+    overlay.querySelectorAll('[data-habit]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        habitState[todayKey] = habitState[todayKey] || {};
+        habitState[todayKey][btn.dataset.habit] = !habitState[todayKey][btn.dataset.habit];
+        writeHabits(habitState);
+        btn.classList.add('is-popping');
+        window.setTimeout(() => btn.classList.remove('is-popping'), 420);
+        renderHabits();
+      });
+    });
+    renderHabits();
+
+    const rerenderMonth = renderVisibleMonth;
+    renderVisibleMonth = (...args) => {
+      rerenderMonth(...args);
+      renderHabits();
+    };
 
     window.KiraDiaryBridge = {
       version: 2,
@@ -389,6 +435,6 @@
     };
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountOverlay);
-  else mountOverlay();
+  if (document.body) mountOverlay();
+  else document.addEventListener('DOMContentLoaded', mountOverlay);
 })();

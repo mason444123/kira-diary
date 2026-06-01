@@ -1326,6 +1326,163 @@ body.kira-mode #kira-overlay .word-close { position:absolute; top:12px; right:12
   body.kira-mode #kira-overlay .multitool-nav { left: 12px; right: 12px; }
 }
 
+
+/* Quick habit orbs: supplements / gym / money */
+body.kira-mode #kira-overlay .habit-orbs {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin: 16px 0 14px;
+}
+body.kira-mode #kira-overlay .habit-orb {
+  appearance: none;
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,.78);
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255,255,255,.18), transparent 32%),
+    linear-gradient(145deg, rgba(255, 231, 156, .13), rgba(100, 65, 20, .05) 44%, rgba(0,0,0,.14));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -10px 24px rgba(0,0,0,.12),
+    0 12px 28px rgba(0,0,0,.16);
+  backdrop-filter: blur(18px) saturate(1.45);
+  -webkit-backdrop-filter: blur(18px) saturate(1.45);
+  cursor: pointer;
+  transform: translateZ(0);
+  transition: transform .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+body.kira-mode #kira-overlay .habit-orb::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border: 1px solid rgba(255,255,255,.08);
+  pointer-events: none;
+}
+body.kira-mode #kira-overlay .habit-orb__glow {
+  position: absolute;
+  inset: -18px;
+  border-radius: inherit;
+  opacity: 0;
+  transform: scale(.65);
+  background:
+    radial-gradient(circle, rgba(234,211,122,.72) 0 18%, rgba(234,211,122,.18) 38%, transparent 62%);
+  filter: blur(8px);
+  transition: opacity .25s ease, transform .35s cubic-bezier(.2, 1.6, .25, 1);
+}
+body.kira-mode #kira-overlay .habit-orb.is-active {
+  color: #fff7d8;
+  border-color: rgba(240,221,143,.52);
+  background:
+    radial-gradient(circle at 35% 24%, rgba(255,255,255,.28), transparent 30%),
+    linear-gradient(145deg, rgba(234,211,122,.34), rgba(177, 121, 43, .12) 48%, rgba(0,0,0,.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -12px 26px rgba(0,0,0,.10),
+    0 0 22px rgba(234,211,122,.34),
+    0 14px 32px rgba(0,0,0,.18);
+}
+body.kira-mode #kira-overlay .habit-orb.is-active .habit-orb__glow {
+  opacity: 1;
+  transform: scale(1);
+}
+body.kira-mode #kira-overlay .habit-orb:active,
+body.kira-mode #kira-overlay .habit-orb.is-popping {
+  transform: scale(.92);
+}
+body.kira-mode #kira-overlay .habit-orb.is-popping::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  border: 1px solid rgba(255,246,207,.55);
+  animation: habit-pop .42s ease-out forwards;
+}
+@keyframes habit-pop {
+  0% { opacity: .9; transform: scale(.72); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+body.kira-mode #kira-overlay .habit-icon {
+  position: relative;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+body.kira-mode #kira-overlay .habit-icon::before,
+body.kira-mode #kira-overlay .habit-icon::after {
+  content: "";
+  position: absolute;
+  display: block;
+}
+body.kira-mode #kira-overlay .habit-icon-pill::before {
+  width: 22px;
+  height: 10px;
+  left: 3px;
+  top: 9px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  transform: rotate(-32deg);
+}
+body.kira-mode #kira-overlay .habit-icon-pill::after {
+  width: 2px;
+  height: 10px;
+  left: 13px;
+  top: 9px;
+  background: currentColor;
+  border-radius: 2px;
+  transform: rotate(-32deg);
+  opacity: .75;
+}
+body.kira-mode #kira-overlay .habit-icon-gym::before {
+  left: 4px;
+  right: 4px;
+  top: 12px;
+  height: 3px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: -5px 0 0 -1px currentColor, 5px 0 0 -1px currentColor;
+}
+body.kira-mode #kira-overlay .habit-icon-gym::after {
+  width: 26px;
+  height: 14px;
+  left: 1px;
+  top: 6px;
+  border-left: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+  border-radius: 3px;
+}
+body.kira-mode #kira-overlay .habit-icon-money::before {
+  inset: 5px 4px;
+  border: 2px solid currentColor;
+  border-radius: 7px;
+}
+body.kira-mode #kira-overlay .habit-icon-money::after {
+  content: "$";
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: "Orbitron", "Michroma", Inter, sans-serif;
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 700;
+}
+@media (max-height: 760px) {
+  body.kira-mode #kira-overlay .habit-orbs { gap: 15px; margin: 12px 0; }
+  body.kira-mode #kira-overlay .habit-orb { width: 56px; height: 56px; }
+  body.kira-mode #kira-overlay .habit-icon { transform: scale(.9); }
+}
+
 /* Weather + top title cleanup */
 body.kira-mode #kira-overlay .topbar {
   margin-bottom: 12px;
