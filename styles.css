@@ -344,9 +344,24 @@ h1 {
   padding: 17px 16px 19px;
   background: rgba(0,0,0,.035);
 }
-.month-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.month-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
 .month-head strong { font-size: 22px; letter-spacing: -.045em; font-weight: 720; }
 .month-head span { color: rgba(255,255,255,.58); font-size: 13px; font-weight: 650; padding-top: 4px; }
+.month-nav { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.month-nav button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  color: rgba(255,255,255,.88);
+  background: rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 10px 24px rgba(0,0,0,.18);
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.month-nav button:active { transform: translateY(1px); background: rgba(255,255,255,.14); }
 .dot-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 13px; padding: 2px 3px 0; }
 .dot-calendar i { width: 12px; height: 12px; border-radius: 50%; justify-self: center; background: rgba(255,255,255,.18); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
 .dot-calendar .s9, .dot-calendar .s8 { background: #d7c583; box-shadow: 0 0 14px rgba(215,197,131,.28); }
@@ -834,12 +849,15 @@ body.kira-mode #kira-overlay .score {
   font-size: clamp(76px, 22vw, 100px);
 }
 
-body.kira-mode #kira-overlay .tile strong {
+body.kira-mode #kira-overlay .tile strong,
+body.kira-mode #kira-overlay .month-head strong {
   font-size: 20px;
 }
 
-body.kira-mode #kira-overlay .month-head strong {
-  font-size: 20px;
+body.kira-mode #kira-overlay .month-nav button {
+  border-color: rgba(240,221,143,.20);
+  color: rgba(255,248,218,.92);
+  background: rgba(255,255,255,.07);
 }
 
 /* Kira Diary functional tabs + Health calendar + daily word */

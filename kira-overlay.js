@@ -95,14 +95,14 @@
             </section>
 
             <section class="month-card glass">
-              <div class="month-head"><div><p class="label" data-month-name>${monthNames[now.getMonth()]}</p><strong data-month-status>Нет записей</strong></div></div>
+              <div class="month-head"><div><p class="label" data-month-name>${monthNames[now.getMonth()]}</p><strong data-month-status>Нет записей</strong></div><div class="month-nav"><button type="button" data-month-prev aria-label="Предыдущий месяц">‹</button><button type="button" data-month-next aria-label="Следующий месяц">›</button></div></div>
               <div class="dot-calendar real-month-dots" data-month-dots aria-label="заполненность месяца"></div>
             </section>
           </section>
 
           <section class="kira-screen" data-screen="health">
             <section class="health-card glass">
-              <div class="month-head"><div><p class="label">Здоровье</p><strong data-health-month>${monthNames[now.getMonth()]} · календарь</strong></div></div>
+              <div class="month-head"><div><p class="label">Здоровье</p><strong data-health-month>${monthNames[now.getMonth()]} · календарь</strong></div><div class="month-nav"><button type="button" data-health-prev aria-label="Предыдущий месяц">‹</button><button type="button" data-health-next aria-label="Следующий месяц">›</button></div></div>
               <div class="health-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
               <div class="health-calendar" data-health-calendar></div>
             </section>
@@ -265,12 +265,41 @@
     const todayEntry = entryStore[todayKey] || entryList().at(-1);
     const monthEntries = entriesForMonth(y, m);
     const status = overlay.querySelector('[data-month-status]');
+    const monthName = overlay.querySelector('[data-month-name]');
+    const healthMonth = overlay.querySelector('[data-health-month]');
     const score = todayEntry?.kira_score ?? todayEntry?.score;
+    if (monthName) monthName.textContent = `${monthNames[m]} ${y}`;
+    if (healthMonth) healthMonth.textContent = `${monthNames[m]} ${y} · календарь`;
     if (status) status.textContent = monthEntries.length ? `${monthEntries.length} записей` : 'Нет записей';
     overlay.querySelector('[data-tile-mood]').textContent = site(todayEntry, 'mood_score', score == null ? '—' : String(score));
     overlay.querySelector('[data-tile-energy]').textContent = site(todayEntry, 'energy_score', todayEntry?.state?.energy_score ?? '—');
     overlay.querySelector('[data-tile-needed]').textContent = site(todayEntry, 'needed_score', todayEntry?.needs_score ?? '—');
     renderHealthStats(overlay, todayEntry);
+  }
+
+  function addMonths(y, m, delta) {
+    const d = new Date(y, m + delta, 1);
+    return { y: d.getFullYear(), m: d.getMonth() };
+  }
+
+  function latestEntryInMonth(y, m) {
+    return entriesForMonth(y, m).at(-1) || null;
+  }
+
+  function renderVisibleMonth(overlay, calendar, dots, detail, state, preferredDate = null) {
+    const { y, m } = state;
+    renderCalendar(calendar, y, m);
+    renderMonthDots(dots, y, m);
+    renderToday(overlay, y, m);
+
+    const selectedDate = preferredDate && entryStore[preferredDate]
+      ? preferredDate
+      : latestEntryInMonth(y, m)?.date || `${y}-${String(m + 1).padStart(2, '0')}-01`;
+    const activeDay = calendar.querySelector(`[data-date="${selectedDate}"]`);
+    if (activeDay) activeDay.classList.add('selected');
+    const selectedEntry = entryStore[selectedDate];
+    renderEntryDetail(detail, selectedEntry, selectedDate);
+    renderHealthStats(overlay, selectedEntry || latestEntryInMonth(y, m));
   }
 
   async function mountOverlay() {
@@ -285,21 +314,18 @@
     const calendar = overlay.querySelector('[data-health-calendar]');
     const dots = overlay.querySelector('[data-month-dots]');
     const detail = overlay.querySelector('[data-health-detail]');
-    const y = now.getFullYear();
-    const m = now.getMonth();
+    let visibleMonth = { y: now.getFullYear(), m: now.getMonth() };
 
     Object.assign(entryStore, await loadEntries());
     const todayEntryForHealth = entryStore[todayKey] || entryList().at(-1);
 
-    renderCalendar(calendar, y, m);
-    renderMonthDots(dots, y, m);
-    renderToday(overlay, y, m);
     if (todayEntryForHealth) {
-      const activeDay = calendar.querySelector(`[data-date="${todayEntryForHealth.date}"]`);
-      if (activeDay) activeDay.classList.add('selected');
-      renderEntryDetail(detail, todayEntryForHealth, todayEntryForHealth.date);
-      renderHealthStats(overlay, todayEntryForHealth);
+      const entryDate = new Date(`${todayEntryForHealth.date}T00:00:00`);
+      if (!Number.isNaN(entryDate.getTime())) {
+        visibleMonth = { y: entryDate.getFullYear(), m: entryDate.getMonth() };
+      }
     }
+    renderVisibleMonth(overlay, calendar, dots, detail, visibleMonth, todayEntryForHealth?.date);
     updateWeather(overlay);
     setInterval(() => updateWeather(overlay), 10 * 60 * 1000);
 
@@ -318,6 +344,19 @@
         title.textContent = titles[tab][0];
         subtitle.textContent = titles[tab][1];
         overlay.querySelector('.kira-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    overlay.querySelectorAll('[data-month-prev], [data-health-prev]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        visibleMonth = addMonths(visibleMonth.y, visibleMonth.m, -1);
+        renderVisibleMonth(overlay, calendar, dots, detail, visibleMonth);
+      });
+    });
+    overlay.querySelectorAll('[data-month-next], [data-health-next]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        visibleMonth = addMonths(visibleMonth.y, visibleMonth.m, 1);
+        renderVisibleMonth(overlay, calendar, dots, detail, visibleMonth);
       });
     });
 
@@ -341,9 +380,9 @@
       getEntries: () => structuredClone(entryStore),
       addEntryFromText: (text, date = dateKey()) => {
         entryStore[date] = { text: String(text).slice(0, 500), createdAt: new Date().toISOString() };
-        renderCalendar(calendar, y, m);
-        renderMonthDots(dots, y, m);
-        renderToday(overlay, y, m);
+        renderCalendar(calendar, visibleMonth.y, visibleMonth.m);
+        renderMonthDots(dots, visibleMonth.y, visibleMonth.m);
+        renderToday(overlay, visibleMonth.y, visibleMonth.m);
         window.dispatchEvent(new CustomEvent('kira:diary-entry-added', { detail: { date, text } }));
         return entryStore[date];
       }
