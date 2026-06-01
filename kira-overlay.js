@@ -63,10 +63,15 @@
   const MONTH_STORAGE_KEY = 'kiraDiary.visibleMonth';
   const HABIT_STORAGE_KEY = 'kiraDiary.habits.v1';
   const habitDefs = [
-    { id: 'supplements', label: 'Выпил добавки', icon: 'pill' },
-    { id: 'gym', label: 'Сходил в зал', icon: 'gym' },
-    { id: 'money', label: 'Заработал денег', icon: 'money' }
+    { id: 'supplements', label: 'Выпил добавки', icon: 'supplements' },
+    { id: 'gym', label: 'Сходил в зал', icon: 'training' },
+    { id: 'money', label: 'Заработал денег', icon: 'ruble' }
   ];
+  const habitIcons = {
+    supplements: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17.2 30.8 30.8 17.2a8.2 8.2 0 0 1 11.6 11.6L28.8 42.4a8.2 8.2 0 0 1-11.6-11.6Z"/><path d="M23.8 24.2 35 35.4"/><path d="M8 12.5h6.8M11.4 9.1v6.8M6.5 27h4.8"/></svg>',
+    training: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 21.5h6M35 21.5h6M13 17v14M35 17v14M17 24h14"/><path d="M18.5 13.5c1.6-3.2 3.7-4.9 5.5-4.9s3.9 1.7 5.5 4.9"/></svg>',
+    ruble: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M18 38V9h10.5c6.1 0 10.1 3.3 10.1 8.6 0 5.4-4 8.7-10.1 8.7H13"/><path d="M13 32h19"/><path d="M18 26.3V32"/></svg>'
+  };
 
   function saveVisibleMonth(state) {
     try { localStorage.setItem(MONTH_STORAGE_KEY, JSON.stringify({ y: state.y, m: state.m })); } catch (_) {}
@@ -111,8 +116,13 @@
               <div class="wave is-empty"><span></span><span></span><span></span><i class="dot dot-l"></i><i class="dot dot-r"></i></div>
             </section>
 
+            <section class="daily-pair" aria-label="Сводка дня">
+              <article class="glass tile compact-tile"><span class="tile-icon icon-wake"></span><p>Настроение</p><strong data-tile-mood>—</strong></article>
+              <article class="glass tile compact-tile"><span class="tile-icon icon-sleep"></span><p>Энергия</p><strong data-tile-energy>—</strong></article>
+            </section>
+
             <section class="habit-orbs" aria-label="Быстрые отметки дня">
-              ${habitDefs.map((habit) => `<button class="habit-orb" type="button" data-habit="${habit.id}" aria-label="${habit.label}"><span class="habit-orb__glow"></span><span class="habit-icon habit-icon-${habit.icon}" aria-hidden="true"></span></button>`).join('')}
+              ${habitDefs.map((habit) => `<button class="habit-orb" type="button" data-habit="${habit.id}" aria-label="${habit.label}"><span class="habit-orb__glow"></span><span class="habit-icon" aria-hidden="true">${habitIcons[habit.icon]}</span></button>`).join('')}
             </section>
 
             <section class="month-card glass">
