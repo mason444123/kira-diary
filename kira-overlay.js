@@ -61,17 +61,6 @@
   const todayKey = dateKey(now);
   const todayWord = wordFor(todayKey);
   const MONTH_STORAGE_KEY = 'kiraDiary.visibleMonth';
-  const HABIT_STORAGE_KEY = 'kiraDiary.habits.v1';
-  const habitDefs = [
-    { id: 'supplements', label: 'Выпил БАД', text: 'БАД' },
-    { id: 'gym', label: 'Зал отмечен', text: 'Зал' },
-    { id: 'money', label: 'Деньги отмечены', text: 'Деньги' }
-  ];
-  const habitClassMap = {
-    supplements: 'habit-bad',
-    gym: 'habit-gym',
-    money: 'habit-money'
-  };
 
   function saveVisibleMonth(state) {
     try { localStorage.setItem(MONTH_STORAGE_KEY, JSON.stringify({ y: state.y, m: state.m })); } catch (_) {}
@@ -83,13 +72,6 @@
     } catch (_) {}
     return null;
   }
-  function readHabits() {
-    try { return JSON.parse(localStorage.getItem(HABIT_STORAGE_KEY) || '{}') || {}; } catch (_) { return {}; }
-  }
-  function writeHabits(state) {
-    try { localStorage.setItem(HABIT_STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
-  }
-
   const overlayHtml = `
     <main id="kira-overlay" class="phone-frame" aria-label="Дневник">
       <section class="hero-scene">
@@ -119,10 +101,6 @@
             <section class="daily-pair" aria-label="Сводка дня">
               <article class="glass tile compact-tile"><span class="tile-icon icon-wake"></span><p>Настроение</p><strong data-tile-mood>—</strong></article>
               <article class="glass tile compact-tile"><span class="tile-icon icon-sleep"></span><p>Энергия</p><strong data-tile-energy>—</strong></article>
-            </section>
-
-            <section class="habit-orbs" aria-label="Быстрые отметки дня">
-              ${habitDefs.map((habit) => `<button class="habit-orb" type="button" data-habit="${habit.id}" aria-label="${habit.label}"><span class="habit-orb__glow"></span><span class="habit-text" aria-hidden="true">${habit.text}</span></button>`).join('')}
             </section>
 
             <section class="month-card glass">
@@ -199,16 +177,10 @@
   function renderMonthDots(root, y, m) {
     let html = '';
     const total = daysInMonth(y, m);
-    const habitState = readHabits();
     for (let d = 1; d <= total; d++) {
       const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const entry = !!entryStore[k];
-      const habits = habitState[k] || {};
-      const habitClasses = Object.keys(habits)
-        .filter((id) => habits[id] && habitClassMap[id])
-        .map((id) => habitClassMap[id])
-        .join(' ');
-      html += `<i class="${entry ? 'filled' : 'empty'} ${habitClasses}" title="${k}"></i>`;
+      html += `<i class="${entry ? 'filled' : 'empty'}" title="${k}"></i>`;
     }
     root.innerHTML = html;
   }
@@ -229,15 +201,60 @@
     return entry?.diary_text || entry?.edited_text || entry?.raw_transcript || site(entry, 'health_detail', 'Данные сохранены.');
   }
 
+  function listToHtml(items) {
+    if (!items) return '';
+    const arr = Array.isArray(items) ? items : [items];
+    return arr.filter(Boolean).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+  }
+
+  function manualEntriesHtml(entry) {
+    const candidates = [
+      ...(Array.isArray(entry?.manual_entries) ? entry.manual_entries : []),
+      ...(Array.isArray(entry?.user_entries) ? entry.user_entries : []),
+      ...(Array.isArray(entry?.notes_manual) ? entry.notes_manual : []),
+      ...(entry?.text ? [entry.text] : [])
+    ].filter(Boolean);
+    const raw = entry?.raw_transcript && !String(entry.raw_transcript).startsWith('Read-only Telegram backfill') && !String(entry.raw_transcript).startsWith('Восстановлено по read-only Telegram-сбору')
+      ? String(entry.raw_transcript).trim()
+      : '';
+    const items = candidates.length ? candidates : (raw ? [raw] : []);
+    return items.length ? listToHtml(items) : '<li class="muted">Пока нет отдельных ручных записей за день.</li>';
+  }
+
+  function autoNotesHtml(entry) {
+    const items = [
+      ...(Array.isArray(entry?.events) ? entry.events : []),
+      ...(Array.isArray(entry?.work?.done) ? entry.work.done : []),
+      ...(Array.isArray(entry?.health?.notes) ? entry.health.notes : []),
+      ...(Array.isArray(entry?.needs) ? entry.needs.map((x) => `Нужно: ${x}`) : [])
+    ].filter(Boolean).slice(0, 10);
+    return items.length ? listToHtml(items) : '<li class="muted">Автозаметок пока нет.</li>';
+  }
+
   function renderEntryDetail(detail, entry, date) {
     if (!entry) {
       detail.innerHTML = `<p class="label">${date}</p><strong>Нет записи</strong><span>Этот день пока пустой.</span>`;
       return;
     }
     detail.innerHTML = `
-      <p class="label">${escapeHtml(date)}</p>
-      <strong>${escapeHtml(site(entry, 'mood', 'Запись есть'))}</strong>
-      <span>${escapeHtml(diaryText(entry))}</span>`;
+      <details class="entry-collapse">
+        <summary>
+          <span><em>${escapeHtml(date)}</em><strong>${escapeHtml(site(entry, 'mood', 'Запись есть'))}</strong></span>
+          <b>открыть</b>
+        </summary>
+        <div class="entry-section entry-auto">
+          <p class="label">Автозаметки</p>
+          <ul>${autoNotesHtml(entry)}</ul>
+        </div>
+        <div class="entry-section entry-manual">
+          <p class="label">Мои записи</p>
+          <ul>${manualEntriesHtml(entry)}</ul>
+        </div>
+        <div class="entry-section entry-full">
+          <p class="label">Итог дня</p>
+          <span>${escapeHtml(diaryText(entry))}</span>
+        </div>
+      </details>`;
   }
 
   function setHealthStat(overlay, key, value, note) {
@@ -354,7 +371,6 @@
     const dots = overlay.querySelector('[data-month-dots]');
     const detail = overlay.querySelector('[data-health-detail]');
     let visibleMonth = readVisibleMonth() || { y: now.getFullYear(), m: now.getMonth() };
-    const habitState = readHabits();
 
     Object.assign(entryStore, await loadEntries());
     const todayEntryForHealth = entryStore[todayKey] || entryList().at(-1);
@@ -412,32 +428,6 @@
       renderEntryDetail(detail, selectedEntry, day.dataset.date);
       renderHealthStats(overlay, selectedEntry);
     });
-
-    function renderHabits() {
-      overlay.querySelectorAll('[data-habit]').forEach((btn) => {
-        const active = !!habitState?.[todayKey]?.[btn.dataset.habit];
-        btn.classList.toggle('is-active', active);
-        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-      });
-    }
-    overlay.querySelectorAll('[data-habit]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        habitState[todayKey] = habitState[todayKey] || {};
-        habitState[todayKey][btn.dataset.habit] = !habitState[todayKey][btn.dataset.habit];
-        writeHabits(habitState);
-        btn.classList.add('is-popping');
-        window.setTimeout(() => btn.classList.remove('is-popping'), 420);
-        renderHabits();
-        renderMonthDots(dots, visibleMonth.y, visibleMonth.m);
-      });
-    });
-    renderHabits();
-
-    const rerenderMonth = renderVisibleMonth;
-    renderVisibleMonth = (...args) => {
-      rerenderMonth(...args);
-      renderHabits();
-    };
 
     window.KiraDiaryBridge = {
       version: 2,

@@ -1009,6 +1009,87 @@ body.kira-mode #kira-overlay .health-summary-grid.is-empty + .diary-text-card {
 body.kira-mode #kira-overlay .diary-text-card span {
   white-space: pre-line;
 }
+
+body.kira-mode #kira-overlay .entry-collapse {
+  display: block;
+}
+body.kira-mode #kira-overlay .entry-collapse > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 76px;
+}
+body.kira-mode #kira-overlay .entry-collapse > summary::-webkit-details-marker { display: none; }
+body.kira-mode #kira-overlay .entry-collapse summary span,
+body.kira-mode #kira-overlay .entry-collapse summary em,
+body.kira-mode #kira-overlay .entry-collapse summary strong {
+  display: block;
+  margin: 0;
+  min-width: 0;
+}
+body.kira-mode #kira-overlay .entry-collapse summary em {
+  color: rgba(255,255,255,.48);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+body.kira-mode #kira-overlay .entry-collapse summary b {
+  flex: 0 0 auto;
+  color: rgba(255,255,255,.62);
+  font-size: 10px;
+  font-weight: 780;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  padding: 8px 10px;
+}
+body.kira-mode #kira-overlay .entry-collapse[open] summary b { color: transparent; font-size: 0; }
+body.kira-mode #kira-overlay .entry-collapse[open] summary b::after {
+  content: 'свернуть';
+  color: rgba(255,255,255,.62);
+  font-size: 10px;
+}
+body.kira-mode #kira-overlay .entry-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+body.kira-mode #kira-overlay .entry-section ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+body.kira-mode #kira-overlay .entry-section li {
+  color: rgba(255,255,255,.66);
+  font-size: 12px;
+  line-height: 1.45;
+  padding-left: 14px;
+  position: relative;
+  overflow-wrap: anywhere;
+}
+body.kira-mode #kira-overlay .entry-section li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(234,211,122,.78);
+}
+body.kira-mode #kira-overlay .entry-section li.muted { color: rgba(255,255,255,.36); }
+body.kira-mode #kira-overlay .entry-section li.muted::before { background: rgba(255,255,255,.22); }
+body.kira-mode #kira-overlay .entry-full span {
+  white-space: pre-line;
+  color: rgba(255,255,255,.58);
+}
 body.kira-mode #kira-overlay .stat-card { margin-top: 0; min-height: 88px; padding: 14px; }
 body.kira-mode #kira-overlay .stat-card p {
   margin: 0;
