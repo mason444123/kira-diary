@@ -2049,3 +2049,38 @@ body.kira-mode #kira-overlay .word-tile small {
   body.kira-mode #kira-overlay .weather-meta { font-size: 11px; }
   body.kira-mode #kira-overlay .word-tile { padding-top: 42px; }
 }
+
+/* Daily summary QA: cards grow by content instead of clipping/stacking into each other */
+body.kira-mode #kira-overlay .health-card,
+body.kira-mode #kira-overlay .health-detail,
+body.kira-mode #kira-overlay .stat-card,
+body.kira-mode #kira-overlay .diary-text-card {
+  box-sizing: border-box;
+}
+body.kira-mode #kira-overlay .health-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  align-items: stretch;
+  gap: 12px;
+}
+body.kira-mode #kira-overlay .health-summary-grid .stat-card {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+body.kira-mode #kira-overlay .health-summary-grid .stat-card span,
+body.kira-mode #kira-overlay .health-summary-grid .stat-card strong,
+body.kira-mode #kira-overlay .health-detail span,
+body.kira-mode #kira-overlay .entry-section li {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+body.kira-mode #kira-overlay .diary-text-card {
+  overflow: visible !important;
+}
+@media (max-width: 430px) {
+  body.kira-mode #kira-overlay .health-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

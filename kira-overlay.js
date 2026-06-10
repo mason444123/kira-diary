@@ -56,6 +56,48 @@
   }
   function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
   function monthOffset(y, m) { return (new Date(y, m, 1).getDay() + 6) % 7; }
+  function previousDateKey(d = new Date()) {
+    const prev = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1);
+    return dateKey(prev);
+  }
+  function latestCompletedEntry() {
+    const yesterdayKey = previousDateKey(now);
+    return entryStore[yesterdayKey]
+      || entryList().filter((entry) => String(entry.date || '') < todayKey).at(-1)
+      || entryList().at(-1)
+      || null;
+  }
+  function metricNumber(value, kind = 'mood') {
+    if (value == null || value === '') return null;
+    if (typeof value === 'number' && Number.isFinite(value)) return Math.round(value * 10) / 10;
+    const text = String(value).trim().toLowerCase();
+    const direct = text.match(/\d+(?:[.,]\d+)?/);
+    if (direct) return Math.round(Number(direct[0].replace(',', '.')) * 10) / 10;
+    if (kind === 'energy') {
+      if (text.includes('высок') || text.includes('актив') || text.includes('разгон') || text.includes('ожив')) return 7;
+      if (text.includes('сред') || text.includes('норм')) return 5;
+      if (text.includes('низ') || text.includes('вял') || text.includes('желе') || text.includes('просад')) return 4;
+      if (text.includes('нет сил') || text.includes('без сил') || text.includes('истощ')) return 3;
+    } else {
+      if (text.includes('хорош') || text.includes('позитив') || text.includes('спокой')) return 7;
+      if (text.includes('смеш') || text.includes('норм') || text.includes('нейтрал')) return 6;
+      if (text.includes('низ') || text.includes('груст') || text.includes('раздраж') || text.includes('трев')) return 4;
+    }
+    return null;
+  }
+  function metricScore(entry, kind = 'mood') {
+    if (!entry) return '—';
+    const siteBlocks = entry.site_blocks || {};
+    const state = entry.state || {};
+    const candidates = kind === 'energy'
+      ? [siteBlocks.energy_score, state.energy_score, state.energy, siteBlocks.energy]
+      : [siteBlocks.mood_score, state.mood_score, entry.kira_score, entry.score, siteBlocks.mood, state.mood_now];
+    for (const candidate of candidates) {
+      const n = metricNumber(candidate, kind);
+      if (n != null && !Number.isNaN(n)) return String(n);
+    }
+    return '—';
+  }
 
   const now = new Date();
   const todayKey = dateKey(now);
@@ -315,22 +357,21 @@
   }
 
   function renderToday(overlay, y, m) {
-    const todayEntry = entryStore[todayKey] || entryList().at(-1);
+    const summaryEntry = latestCompletedEntry();
     const monthEntries = entriesForMonth(y, m);
     const status = overlay.querySelector('[data-month-status]');
     const monthName = overlay.querySelector('[data-month-name]');
     const healthMonth = overlay.querySelector('[data-health-month]');
-    const score = todayEntry?.kira_score ?? todayEntry?.score;
     if (monthName) monthName.textContent = `${monthNames[m]} ${y}`;
     if (healthMonth) healthMonth.textContent = `${monthNames[m]} ${y} · календарь`;
     if (status) status.textContent = monthEntries.length ? `${monthEntries.length} записей` : 'Нет записей';
     const moodTile = overlay.querySelector('[data-tile-mood]');
     const energyTile = overlay.querySelector('[data-tile-energy]');
     const neededTile = overlay.querySelector('[data-tile-needed]');
-    if (moodTile) moodTile.textContent = site(todayEntry, 'mood_score', score == null ? '—' : String(score));
-    if (energyTile) energyTile.textContent = site(todayEntry, 'energy_score', todayEntry?.state?.energy_score ?? '—');
-    if (neededTile) neededTile.textContent = site(todayEntry, 'needed_score', todayEntry?.needs_score ?? '—');
-    renderHealthStats(overlay, todayEntry);
+    if (moodTile) moodTile.textContent = metricScore(summaryEntry, 'mood');
+    if (energyTile) energyTile.textContent = metricScore(summaryEntry, 'energy');
+    if (neededTile) neededTile.textContent = site(summaryEntry, 'needed_score', summaryEntry?.needs_score ?? '—');
+    renderHealthStats(overlay, summaryEntry);
   }
 
   function addMonths(y, m, delta) {
