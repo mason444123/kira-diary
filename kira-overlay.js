@@ -205,9 +205,9 @@
       const c = data.current || {};
       const temp = Math.round(c.temperature_2m);
       const feels = Math.round(c.apparent_temperature);
-      const wind = Math.round(c.wind_speed_10m);
+      const wind = Math.round(c.wind_speed_10m / 3.6);
       main.textContent = `${temp > 0 ? '+' : ''}${temp}°`;
-      meta.textContent = `ощущается ${feels > 0 ? '+' : ''}${feels}° · ветер ${wind} км/ч`;
+      meta.textContent = `ощущается ${feels > 0 ? '+' : ''}${feels}° · ветер ${wind} м/с`;
       if (time) time.textContent = 'Ишим';
     } catch (err) {
       main.textContent = 'погода недоступна';
