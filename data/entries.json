@@ -3346,5 +3346,65 @@
       "stress": "Высокий: дроны/учения и перекрытия в городе, тревога за близких, здоровье Саши, простуда перед съёмкой.",
       "what_helps": "Поддержка близких, юмор, конкретные действия: фото, цветы/конфеты, проверка фактов и инструкций."
     }
+  },
+  "2026-06-19": {
+    "date": "2026-06-19",
+    "logged": true,
+    "raw_transcript": "Дневник немного позанимался спортом дома. По отжимался. Если получится схожу в зал сегодня еще",
+    "diary_text": "Немного позанимался спортом дома: поотжимался. Если получится, сегодня ещё схожу в зал.",
+    "kira_score": 3.7,
+    "sleep": {
+      "sleep_time": null,
+      "wake_time": null,
+      "duration_hours": null,
+      "quality": null
+    },
+    "state": {
+      "mood_morning": null,
+      "mood_day": null,
+      "mood_evening": null,
+      "mood_now": null,
+      "energy": null,
+      "stress": null,
+      "anxiety": null,
+      "body": "лёгкая домашняя тренировка: отжимания"
+    },
+    "events": [
+      "Немного позанимался спортом дома: отжимания"
+    ],
+    "health": {
+      "symptoms": [],
+      "doctor": [],
+      "medicine": [],
+      "analysis": [],
+      "notes": [
+        "домашний спорт подтверждён; поход в зал пока только план, не факт"
+      ]
+    },
+    "work": {
+      "done": [],
+      "main_useful_action": "лёгкая домашняя тренировка",
+      "productivity": null
+    },
+    "money": {
+      "income": [],
+      "expenses": [],
+      "debts": [],
+      "loans": [],
+      "balance_notes": []
+    },
+    "needs": [],
+    "tomorrow": [
+      "Если получится — сходить в зал сегодня"
+    ],
+    "site_blocks": {
+      "mood": null,
+      "energy": null,
+      "needed": "если будут силы — сходить в зал",
+      "month_status": null,
+      "health_detail": "лёгкая домашняя тренировка: отжимания; зал пока в планах",
+      "stress": null,
+      "what_helps": "небольшая физическая активность дома"
+    }
   }
 }
