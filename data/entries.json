@@ -4421,5 +4421,118 @@
       "stress": "конфликт с Ксешей, неоплаченная работа, поиск работы, экзистенциальная усталость",
       "what_helps": "завершённый сайт, разговор с Sugar Mommy, фикс бага Hermes, мотивационные кроны"
     }
+  },
+  "2026-06-30": {
+    "date": "2026-06-30",
+    "logged": true,
+    "raw_transcript": "Telegram read-only backfill 2026-06-30 (00:00 UTC+5 to 04:00 next day). Sources: personal chats @bugaev_space (Kira bot, Sugar Mommy/Vera, Polina, Ksesha, Dana, CloseRouter, ExpressHost, OpenClaw Lab Community, Saved Messages). ~613 messages from scanned dialogs.",
+    "diary_text": "30 June. Night: watched movies, tested AI censorship. Morning: bad mood, loneliness, melatonin zero effect. First job interview scheduled (mrk.prod, video editing) - HR no-show. Met Polina's grandma and Olesya. Asked Vera for 300 RUB for Ozon. Ksesha agreed to 3000 RUB for website but started ignoring. Kira ran Diana job scan. Evening: existential career confusion. Night: bought $1 Google AI subscription, tried Nano Banana image gen through VLESS proxy, built glm-chat CLI tool, packaged for Windows.",
+    "kira_score": 6.3,
+    "sleep": {
+      "sleep_time": "03:00",
+      "wake_time": "11:30",
+      "duration_hours": 8.5,
+      "quality": "poor - melatonin zero effect, woke up groggy"
+    },
+    "state": {
+      "mood_morning": "bad - strange unpleasant mood, lethargy, loneliness",
+      "mood_day": "anxious before interview, then disappointed (HR no-show)",
+      "mood_evening": "exhausted, fell asleep, money stress, career confusion",
+      "mood_now": "analytical but heavy, existential about career",
+      "energy": "low",
+      "stress": "high - job interview, money, Ksesha ignoring, career uncertainty",
+      "anxiety": "high - existential about work/projects, fear of quitting halfway",
+      "body": "lethargic, melatonin ineffective"
+    },
+    "events": [
+      "Night: watched movies, tested AI model censorship (Taiwan/Tiananmen) via CloseRouter Claude Opus 4.7",
+      "Morning: chat with Vera about House of the Dragon, dragons, empathy",
+      "Day: read threads about job market crisis - people searching months",
+      "17:30 first ever job interview (mrk.prod, video editing) - HR no-show, call never happened",
+      "Met Polina's grandma and Olesya on the street, chatted",
+      "Asked Vera for 300 RUB for Ozon - she agreed and sent",
+      "Ksesha agreed to pay 3000 RUB for website but started ignoring",
+      "Kira/Diana: scanned 21 job channels, filtered leads",
+      "Night: Google Gemini API - bought $1 subscription, tried Nano Banana, VLESS proxy bypass",
+      "Built Python CLI chat glm-chat for GLM 5.2, packaged as zip for Windows",
+      "Sent WiFi guide to Kira to format as HTML for phone reading"
+    ],
+    "health": {
+      "symptoms": [
+        "lethargy, poor sleep (melatonin no effect)"
+      ],
+      "doctor": [],
+      "medicine": [
+        "melatonin (taken - zero effect)"
+      ],
+      "analysis": [],
+      "notes": [
+        "Ksesha mentions being sick (fever), working on shift despite illness"
+      ]
+    },
+    "work": {
+      "done": [
+        "AI censorship test via CloseRouter (Claude Opus 4.7)",
+        "Kira analyzed job offer text (mrk.prod) for AI generation",
+        "Diana job scan (21 channels, 5 days) - filtered leads",
+        "Google Gemini API research: subscription, VLESS proxy bypass",
+        "Built Python CLI chat glm-chat for GLM 5.2 with opencode-go key",
+        "Asked Kira to format WiFi guide as HTML"
+      ],
+      "main_useful_action": "Diana job scan + glm-chat CLI tool + Google IP-block VLESS bypass",
+      "productivity": "medium - lots of exploration/research, no client work; interview no-show"
+    },
+    "money": {
+      "income": [
+        {
+          "source": "Sugar Mommy (Vera)",
+          "amount": 300,
+          "currency": "RUB",
+          "note": "Ozon, help/income"
+        }
+      ],
+      "expenses": [
+        {
+          "item": "Google AI subscription (5TB + AI, 18 months)",
+          "amount": 1,
+          "currency": "USD",
+          "confirmed": true,
+          "note": "$1 promo"
+        }
+      ],
+      "debts": [],
+      "loans": [],
+      "balance_notes": [
+        "Ksesha agreed to pay 3000 RUB for website but started ignoring - not confirmed",
+        "Bula: 5000 RUB promised from previous days, still unconfirmed",
+        "Expected money for food and cigarettes - not sent, being ignored",
+        "Considered taking a loan if Ksesha doesnt pay"
+      ]
+    },
+    "needs": [
+      "Get payment from Ksesha (3000 RUB for website)",
+      "Get payment from Bula (5000 RUB, pending)",
+      "Decide direction: keep job searching or build own projects",
+      "Money for food and cigarettes"
+    ],
+    "tomorrow": [
+      "Follow up on mrk.prod interview (if HR responds)",
+      "Resolve Ksesha payment issue",
+      "Help Polina's grandma with lottery tickets",
+      "Continue Diana job scan leads or start own project"
+    ],
+    "site_blocks": {
+      "mood": "bad to anxious to exhausted",
+      "mood_score": 3,
+      "energy": "low",
+      "energy_score": 2,
+      "needed": "money for food/cigarettes, decide career direction",
+      "needed_score": 4,
+      "month_status": "2026-06: 30 June, interview no-show, active day but no income",
+      "health_detail": "Poor sleep: melatonin no effect, fell asleep ~03:00, woke up lethargic. No acute physical symptoms, just low energy.",
+      "stress": "high: money, interview, career dead end, relationships",
+      "what_helps": "talks with Vera, Diana job scan, technical projects (glm-chat, Gemini API), pattern awareness"
+    },
+    "manual_entries": []
   }
 }
