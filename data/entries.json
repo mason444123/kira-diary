@@ -4425,113 +4425,113 @@
   "2026-06-30": {
     "date": "2026-06-30",
     "logged": true,
-    "raw_transcript": "Telegram read-only backfill 2026-06-30 (00:00 UTC+5 to 04:00 next day). Sources: personal chats @bugaev_space (Kira bot, Sugar Mommy/Vera, Polina, Ksesha, Dana, CloseRouter, ExpressHost, OpenClaw Lab Community, Saved Messages). ~613 messages from scanned dialogs.",
-    "diary_text": "30 June. Night: watched movies, tested AI censorship. Morning: bad mood, loneliness, melatonin zero effect. First job interview scheduled (mrk.prod, video editing) - HR no-show. Met Polina's grandma and Olesya. Asked Vera for 300 RUB for Ozon. Ksesha agreed to 3000 RUB for website but started ignoring. Kira ran Diana job scan. Evening: existential career confusion. Night: bought $1 Google AI subscription, tried Nano Banana image gen through VLESS proxy, built glm-chat CLI tool, packaged for Windows.",
+    "raw_transcript": "Сборка из Telegram (только чтение) 2026-06-30 (00:00 UTC+5 до 04:00 следующего дня). Источники: личные чаты @bugaev_space (Kira bot, Sugar Mommy/Вера, Полина, Ксеша, Дана, CloseRouter, ExpressHost, OpenClaw Lab Community, Saved Messages). ~613 сообщений из просканированных диалогов.",
+    "diary_text": "30 июня. Ночь: смотрел фильмы, тестировал цензуру ИИ. Утро: плохое настроение, одиночество, мелатонин — ноль эффекта. Первый в жизни собес (mrk.prod, видеомонтаж) — HR не пришёл, созвон не состоялся. Встретил бабушку Полины и Олесю на улице. Попросил у Веры 300₽ на Озон — она скинула. Ксеша согласилась на 3000₽ за сайт, но начала игнорить. Кира запустила скан Дианы по вакансиям. Вечер: экзистенциальная растерянность по поводу работы. Ночь: купил подписку Google AI за $1, попробовал генерацию картинок через VLESS-прокси, собрал консольный чат glm-chat для GLM 5.2, упаковал архив для Windows.",
     "kira_score": 6.3,
     "sleep": {
       "sleep_time": "03:00",
       "wake_time": "11:30",
       "duration_hours": 8.5,
-      "quality": "poor - melatonin zero effect, woke up groggy"
+      "quality": "плохой — мелатонин не помог, проснулся разбитым"
     },
     "state": {
-      "mood_morning": "bad - strange unpleasant mood, lethargy, loneliness",
-      "mood_day": "anxious before interview, then disappointed (HR no-show)",
-      "mood_evening": "exhausted, fell asleep, money stress, career confusion",
-      "mood_now": "analytical but heavy, existential about career",
-      "energy": "low",
-      "stress": "high - job interview, money, Ksesha ignoring, career uncertainty",
-      "anxiety": "high - existential about work/projects, fear of quitting halfway",
-      "body": "lethargic, melatonin ineffective"
+      "mood_morning": "плохое — странное неприятное настроение, вялость, одиночество",
+      "mood_day": "тревога перед собесом, потом разочарование (HR не пришёл)",
+      "mood_evening": "истощение, уснул, денежный стресс, растерянность по работе",
+      "mood_now": "аналитическое, но тяжёлое — экзистенциальная тревога по карьере",
+      "energy": "низкая",
+      "stress": "высокий — собес, деньги, Ксеша игнорит, неясность с работой",
+      "anxiety": "высокая — экзистенциальная по проектам/работе, страх бросить на полпути",
+      "body": "вялость, мелатонин не подействовал"
     },
     "events": [
-      "Night: watched movies, tested AI model censorship (Taiwan/Tiananmen) via CloseRouter Claude Opus 4.7",
-      "Morning: chat with Vera about House of the Dragon, dragons, empathy",
-      "Day: read threads about job market crisis - people searching months",
-      "17:30 first ever job interview (mrk.prod, video editing) - HR no-show, call never happened",
-      "Met Polina's grandma and Olesya on the street, chatted",
-      "Asked Vera for 300 RUB for Ozon - she agreed and sent",
-      "Ksesha agreed to pay 3000 RUB for website but started ignoring",
-      "Kira/Diana: scanned 21 job channels, filtered leads",
-      "Night: Google Gemini API - bought $1 subscription, tried Nano Banana, VLESS proxy bypass",
-      "Built Python CLI chat glm-chat for GLM 5.2, packaged as zip for Windows",
-      "Sent WiFi guide to Kira to format as HTML for phone reading"
+      "Ночь: смотрел фильмы, тестировал цензуру ИИ (Тайвань/Тяньаньмэнь) через CloseRouter Claude Opus 4.7",
+      "Утро: переписка с Верой про House of the Dragon, драконов, эмпатию",
+      "День: читал треды про кризис на рынке труда — люди ищут месяцами",
+      "17:30 первый в жизни собес (mrk.prod, видеомонтаж) — HR не пришёл, созвон не состоялся",
+      "Встретил на улице бабушку Полины и Олесю, поболтали",
+      "Попросил у Веры 300₽ на Озон — согласилась, скинула",
+      "Ксеша согласилась на 3000₽ за сайт, но начала игнорить",
+      "Кира/Диана: скан 21 канала вакансий, подборка лидов",
+      "Ночь: Google Gemini API — купил подписку за $1, попробовал генерацию картинок, VLESS-прокси для обхода IP-блока",
+      "Собрал консольный чат glm-chat на Python для GLM 5.2, упаковал архив для Windows",
+      "Отправил гайд по Wi-Fi Кире, чтобы оформила как HTML для чтения с телефона"
     ],
     "health": {
       "symptoms": [
-        "lethargy, poor sleep (melatonin no effect)"
+        "вялость, плохой сон (мелатонин не подействовал)"
       ],
       "doctor": [],
       "medicine": [
-        "melatonin (taken - zero effect)"
+        "мелатонин (выпил — ноль эффекта)"
       ],
       "analysis": [],
       "notes": [
-        "Ksesha mentions being sick (fever), working on shift despite illness"
+        "Ксеша упоминала, что болеет (температура), работает смену несмотря на это"
       ]
     },
     "work": {
       "done": [
-        "AI censorship test via CloseRouter (Claude Opus 4.7)",
-        "Kira analyzed job offer text (mrk.prod) for AI generation",
-        "Diana job scan (21 channels, 5 days) - filtered leads",
-        "Google Gemini API research: subscription, VLESS proxy bypass",
-        "Built Python CLI chat glm-chat for GLM 5.2 with opencode-go key",
-        "Asked Kira to format WiFi guide as HTML"
+        "Тест цензуры ИИ через CloseRouter (Claude Opus 4.7)",
+        "Кира разобрала текст вакансии (mrk.prod) на предмет ИИ-генерации",
+        "Скан Дианы по вакансиям (21 канал, 5 дней) — отфильтрованные лиды",
+        "Исследование Google Gemini API: подписка, обход IP-блока через VLESS-прокси",
+        "Собрал консольный чат glm-chat на Python для GLM 5.2 с ключом opencode-go",
+        "Попросил Киру оформить гайд по Wi-Fi как HTML"
       ],
-      "main_useful_action": "Diana job scan + glm-chat CLI tool + Google IP-block VLESS bypass",
-      "productivity": "medium - lots of exploration/research, no client work; interview no-show"
+      "main_useful_action": "Скан Дианы по вакансиям + чат glm-chat + обход Google IP-блока через VLESS",
+      "productivity": "средняя — много исследований, клиентской работы нет; собес сорван"
     },
     "money": {
       "income": [
         {
-          "source": "Sugar Mommy (Vera)",
+          "source": "Sugar Mommy (Вера)",
           "amount": 300,
           "currency": "RUB",
-          "note": "Ozon, help/income"
+          "note": "на Озон, помощь/доход"
         }
       ],
       "expenses": [
         {
-          "item": "Google AI subscription (5TB + AI, 18 months)",
+          "item": "Подписка Google AI (5ТБ + ИИ, 18 мес)",
           "amount": 1,
           "currency": "USD",
           "confirmed": true,
-          "note": "$1 promo"
+          "note": "промо за $1"
         }
       ],
       "debts": [],
       "loans": [],
       "balance_notes": [
-        "Ksesha agreed to pay 3000 RUB for website but started ignoring - not confirmed",
-        "Bula: 5000 RUB promised from previous days, still unconfirmed",
-        "Expected money for food and cigarettes - not sent, being ignored",
-        "Considered taking a loan if Ksesha doesnt pay"
+        "Ксеша согласилась на 3000₽ за сайт, но начала игнорить — оплата не подтверждена",
+        "Була: 5000₽ обещал ещё с прошлых дней, всё ещё не подтверждено",
+        "Ждал деньги на еду и сигареты — не скинули, игнорят",
+        "Думал взять займ, если Ксеша не заплатит"
       ]
     },
     "needs": [
-      "Get payment from Ksesha (3000 RUB for website)",
-      "Get payment from Bula (5000 RUB, pending)",
-      "Decide direction: keep job searching or build own projects",
-      "Money for food and cigarettes"
+      "Получить оплату от Ксеши (3000₽ за сайт)",
+      "Получить оплату от Булы (5000₽, ожидание)",
+      "Решить направление: искать работу или делать свои проекты",
+      "Деньги на еду и сигареты"
     ],
     "tomorrow": [
-      "Follow up on mrk.prod interview (if HR responds)",
-      "Resolve Ksesha payment issue",
-      "Help Polina's grandma with lottery tickets",
-      "Continue Diana job scan leads or start own project"
+      "Проследить mrk.prod (если HR ответит)",
+      "Решить вопрос с оплатой Ксеши",
+      "Помочь бабушке Полины с билетами",
+      "Продолжить лиды Дианы или начать свой проект"
     ],
     "site_blocks": {
-      "mood": "bad to anxious to exhausted",
+      "mood": "плохое → тревога → истощение",
       "mood_score": 3,
-      "energy": "low",
+      "energy": "низкая",
       "energy_score": 2,
-      "needed": "money for food/cigarettes, decide career direction",
+      "needed": "деньги на еду/сигареты, выбор направления карьеры",
       "needed_score": 4,
-      "month_status": "2026-06: 30 June, interview no-show, active day but no income",
-      "health_detail": "Poor sleep: melatonin no effect, fell asleep ~03:00, woke up lethargic. No acute physical symptoms, just low energy.",
-      "stress": "high: money, interview, career dead end, relationships",
-      "what_helps": "talks with Vera, Diana job scan, technical projects (glm-chat, Gemini API), pattern awareness"
+      "month_status": "2026-06: 30 июня, собес сорван, активный день, но без дохода",
+      "health_detail": "Плохой сон: мелатонин не подействовал, уснул ~03:00, проснулся разбитым. Острых физических симптомов нет, просто низкая энергия.",
+      "stress": "высокий: деньги, собес, тупик по карьере, отношения",
+      "what_helps": "разговоры с Верой, скан Дианы по вакансиям, технические проекты (glm-chat, Gemini API), осознание паттернов"
     },
     "manual_entries": []
   }
