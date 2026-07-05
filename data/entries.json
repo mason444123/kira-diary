@@ -4864,5 +4864,95 @@
       "energy_score": 6,
       "needed_score": 8
     }
+  },
+  "2026-07-04": {
+    "date": "2026-07-04",
+    "logged": true,
+    "raw_transcript": "Read-only Telegram diary collection for 2026-07-04, window 2026-07-04 00:00 to 2026-07-05 04:00 Asia/Yekaterinburg. Source: @bugaev_space personal session. Privacy-preserving summary only. Key facts: woke around 15:00; severe bone aches/weather sensitivity; low energy; worked on Arenda Plus search logic after explicit command; started Angela photos; studied pxpipe; received job leads; contacted people for project feedback/help; went to bar, beer and live social context improved mood/anxiety; found a model for nude shoot; discussed small money help with Vera but transfer not confirmed in text; got home around 03:00 and cooked food; planned to cook for several days.",
+    "diary_text": "The day started late and physically heavy: Ivan woke around 15:00 after severe bone aches, probably weather-related. During the day there was low energy and irritation around Arenda Plus search quality, but after an explicit command the search logic was changed to live filtering instead of using the local database as source of truth. Work/project actions still happened: he started Angela photos, studied pxpipe, received job leads, and in the evening wrote to several people asking for feedback and possible help with the Arenda Plus project. Late evening he went to a bar for beer; mood improved sharply, anxiety became weaker, and he felt young/summer/alive. He also found a model for a nude shoot. He noticed an important pattern: it is worrying that he feels good mostly in a bar/after alcohol. Money/debt feelings around Vera appeared again, but actual transfer is not confirmed in the text. Around 03:00 he was home and cooking food; tomorrow remains photos, cooking for several days, and continuing project outreach.",
+    "kira_score": 6.3,
+    "sleep": {
+      "sleep_time": null,
+      "wake_time": "15:00",
+      "duration_hours": null,
+      "quality": "late disrupted regime; woke in afternoon; severe body aches during night/morning"
+    },
+    "state": {
+      "mood_morning": "heavy/broken, body aches, wanted sleep",
+      "mood_day": "low, irritated, little strength",
+      "mood_evening": "improved in bar after beer and social contact",
+      "mood_now": "very good by night; anxiety lower",
+      "energy": "low daytime, higher evening/night with social context and alcohol",
+      "stress": "medium/high: money, Arenda Plus search quality, project promotion, body/weather",
+      "anxiety": "present during day/evening, decreased in bar",
+      "body": "severe bone aches, weather sensitivity, feeling physically broken"
+    },
+    "events": [
+      "Woke late around 15:00 after a physically hard morning/night.",
+      "Worked through Arenda Plus search-quality problem; after explicit command the logic was changed to live filtering.",
+      "Studied pxpipe repository.",
+      "Received evening job-lead selection.",
+      "Contacted acquaintances/new people for feedback and help with Arenda Plus promotion.",
+      "Went to a bar for beer; mood improved and anxiety decreased.",
+      "Found a model for a nude shoot.",
+      "Got home around 03:00 and cooked food."
+    ],
+    "health": {
+      "symptoms": [
+        "severe bone aches",
+        "low energy/broken state",
+        "weather-sensitive worsening"
+      ],
+      "doctor": [],
+      "medicine": [],
+      "analysis": [],
+      "notes": [
+        "Ivan linked the body state to weather. Alcohol/bar subjectively improved mood, and he noticed this as a risky pattern."
+      ]
+    },
+    "work": {
+      "done": [
+        "Changed Arenda Plus search/notification logic after explicit command.",
+        "Started preparing Angela photos.",
+        "Studied pxpipe.",
+        "Sent project/feedback messages to several people.",
+        "Received and reviewed job leads."
+      ],
+      "main_useful_action": "Focused on project promotion: searched for people who could help Arenda Plus with thoughts or actions and wrote to them directly.",
+      "productivity": "uneven: low energy and irritation daytime, but several real work/project actions happened"
+    },
+    "money": {
+      "income": [],
+      "expenses": [],
+      "debts": [],
+      "loans": [],
+      "balance_notes": [
+        "Bar/beer happened, amount not specified.",
+        "Small help from Vera (300 RUB / later 200 RUB) was discussed, but actual transfer is not confirmed in text, so it is not recorded as income.",
+        "Debt/loan topic with Vera appeared emotionally as stress and gratitude."
+      ]
+    },
+    "needs": [
+      "restore strength and sleep regime",
+      "finish photos",
+      "cook food for several days",
+      "people/feedback/support for project promotion",
+      "less reliance on alcohol as mood support"
+    ],
+    "tomorrow": [
+      "finish Angela photos",
+      "cook something for several days",
+      "wait for Dana/Petersburg acquaintance feedback about work/project",
+      "continue finding people who can help the project"
+    ],
+    "site_blocks": {
+      "mood": "Heavy and low daytime; sharp improvement in bar/from social contact at night",
+      "energy": "3/10 daytime -> 7/10 evening; regime disrupted",
+      "needed": "sleep/regime, food for several days, finish photos, continue project outreach",
+      "month_status": "July: 4 entries; filled days 1, 2, 3, 4",
+      "health_detail": "Severe bone aches/weather sensitivity; woke around 15:00.",
+      "stress": "Money, apartment-search bot quality, project promotion, body/weather.",
+      "what_helps": "Live social contact, music/bar atmosphere, concrete project steps; risk: alcohol as main relief."
+    }
   }
 }
