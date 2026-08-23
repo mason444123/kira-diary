@@ -13,6 +13,7 @@
   const DATA_URL = 'data/entries.json';
   const PROJECTS_URL = 'data/projects.json';
   const LOCAL_PROJECTS_KEY = 'kiraDiary.localProjects';
+  const LOCAL_PROJECT_OVERRIDES_KEY = 'kiraDiary.localProjectOverrides';
   const projectApi = window.KiraProjects || null;
 
   function entryList() {
@@ -68,6 +69,32 @@
   }
   function saveLocalProjects(projects) {
     try { localStorage.setItem(LOCAL_PROJECTS_KEY, JSON.stringify(projects)); return true; } catch (_) { return false; }
+  }
+  function readProjectOverrides() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LOCAL_PROJECT_OVERRIDES_KEY) || '{}');
+      return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  function saveProjectOverrides(overrides) {
+    try { localStorage.setItem(LOCAL_PROJECT_OVERRIDES_KEY, JSON.stringify(overrides)); return true; } catch (_) { return false; }
+  }
+  function mergeProjectOverrides(projects) {
+    const overrides = readProjectOverrides();
+    return projects.map((project) => overrides[project.id]
+      ? projectApi.normalizeProjects({ projects: [{ ...project, ...overrides[project.id] }] })[0]
+      : project);
+  }
+  function saveProjectEdit(project) {
+    const localProjects = readLocalProjects();
+    const localIndex = localProjects.findIndex((item) => item.id === project.id);
+    if (localIndex >= 0) {
+      localProjects[localIndex] = project;
+      return saveLocalProjects(localProjects);
+    }
+    return saveProjectOverrides({ ...readProjectOverrides(), [project.id]: project });
   }
   function addLocalProject(title, needs) {
     const id = `local-${Date.now()}`;
@@ -494,7 +521,7 @@
         const doneText = doneTasks[0]?.title || 'Пока нет завершённых шагов';
         const nextText = nextTasks[0]?.title || project.next_action || 'Следующий шаг не задан';
         const blocker = project.blockers[0] || '';
-        return `<details class="glass work-project"><summary><span class="work-project-title"><b>${escapeHtml(project.title)}</b><em>${escapeHtml(projectStatusLabel[project.status] || project.status)}</em></span><span class="work-project-brief"><span><small>Сделано</small><b>${escapeHtml(doneText)}</b></span><span><small>${blocker ? 'Ждём' : 'Дальше'}</small><b>${escapeHtml(blocker || nextText)}</b></span></span><i class="work-project-open">Подробнее</i></summary><div class="work-project-detail"><p class="work-description">${escapeHtml(project.description || '')}</p>${project.next_action ? `<p class="work-next"><small>Ближайшее действие</small>${escapeHtml(project.next_action)}</p>` : ''}<div class="work-detail-grid"><section><h3>Сделано · ${progress.done}</h3>${taskItemsHtml(doneTasks, project, 'Пока нет завершённых задач.')}</section><section><h3>Дальше · ${progress.remaining}</h3>${taskItemsHtml(nextTasks, project, 'Следующих задач пока нет.')}</section></div>${blocker ? `<p class="work-blocker"><small>Ожидание / блокер</small>${escapeHtml(blocker)}</p>` : ''}<h3>Контекст</h3><ul class="work-decisions">${project.decisions.length ? project.decisions.map((item) => `<li><small>${escapeHtml(item.date)}</small>${escapeHtml(item.text)}</li>`).join('') : '<li class="work-empty">Заметок пока нет.</li>'}</ul></div></details>`;
+        return `<details class="glass work-project"><summary><span class="work-project-title"><b>${escapeHtml(project.title)}</b><em>${escapeHtml(projectStatusLabel[project.status] || project.status)}</em></span><span class="work-project-brief"><span><small>Сделано</small><b>${escapeHtml(doneText)}</b></span><span><small>${blocker ? 'Ждём' : 'Дальше'}</small><b>${escapeHtml(blocker || nextText)}</b></span></span><i class="work-project-open">Подробнее</i></summary><div class="work-project-detail"><p class="work-description">${escapeHtml(project.description || '')}</p>${project.next_action ? `<p class="work-next"><small>Ближайшее действие</small>${escapeHtml(project.next_action)}</p>` : ''}<div class="work-detail-grid"><section><h3>Сделано · ${progress.done}</h3>${taskItemsHtml(doneTasks, project, 'Пока нет завершённых задач.')}</section><section><h3>Дальше · ${progress.remaining}</h3>${taskItemsHtml(nextTasks, project, 'Следующих задач пока нет.')}</section></div>${blocker ? `<p class="work-blocker"><small>Ожидание / блокер</small>${escapeHtml(blocker)}</p>` : ''}<h3>Контекст</h3><ul class="work-decisions">${project.decisions.length ? project.decisions.map((item) => `<li><small>${escapeHtml(item.date)}</small>${escapeHtml(item.text)}</li>`).join('') : '<li class="work-empty">Заметок пока нет.</li>'}</ul><button type="button" class="work-edit-project" data-work-edit-project="${escapeHtml(project.id)}">Редактировать</button></div></details>`;
       }).join('')}</div>`
       : '<p class="work-empty">Проектов пока нет. Добавь их через Kira/обновление data/projects.json.</p>');
   }
@@ -515,31 +542,64 @@
 
     const [entries, projects] = await Promise.all([loadEntries(), loadProjects()]);
     Object.assign(entryStore, entries);
-    projectStore = [...projects, ...readLocalProjects()];
+    projectStore = [...mergeProjectOverrides(projects), ...readLocalProjects()];
     renderWork(overlay);
     const addProjectButton = overlay.querySelector('[data-work-add-project]');
     const projectForm = overlay.querySelector('[data-work-project-form]');
     const cancelProjectButton = overlay.querySelector('[data-work-cancel-project]');
-    addProjectButton?.addEventListener('click', () => {
-      projectForm.hidden = false;
-      addProjectButton.hidden = true;
-      projectForm.querySelector('[name="title"]')?.focus();
-    });
-    cancelProjectButton?.addEventListener('click', () => {
+    const projectsRoot = overlay.querySelector('[data-work-projects]');
+    const formSubmitButton = projectForm?.querySelector('[type="submit"]');
+    function closeProjectForm() {
       projectForm.reset();
+      delete projectForm.dataset.editProjectId;
       projectForm.hidden = true;
       addProjectButton.hidden = false;
+      formSubmitButton.textContent = 'Добавить';
+    }
+    function openProjectForm(project = null) {
+      projectForm.hidden = false;
+      addProjectButton.hidden = true;
+      if (project) {
+        projectForm.dataset.editProjectId = project.id;
+        projectForm.querySelector('[name="title"]').value = project.title;
+        projectForm.querySelector('[name="needs"]').value = project.description || project.next_action || '';
+        formSubmitButton.textContent = 'Сохранить';
+      } else {
+        projectForm.reset();
+        delete projectForm.dataset.editProjectId;
+        formSubmitButton.textContent = 'Добавить';
+      }
+      projectForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      projectForm.querySelector('[name="title"]')?.focus();
+    }
+    addProjectButton?.addEventListener('click', () => openProjectForm());
+    cancelProjectButton?.addEventListener('click', closeProjectForm);
+    projectsRoot?.addEventListener('click', (event) => {
+      const editButton = event.target.closest('[data-work-edit-project]');
+      if (!editButton) return;
+      event.preventDefault();
+      openProjectForm(projectStore.find((project) => project.id === editButton.dataset.workEditProject));
     });
     projectForm?.addEventListener('submit', (event) => {
       event.preventDefault();
       const formData = new FormData(projectForm);
-      const project = addLocalProject(formData.get('title'), formData.get('needs'));
-      if (!project) return;
-      projectStore.push(project);
+      const title = String(formData.get('title') || '').trim();
+      const needs = String(formData.get('needs') || '').trim();
+      const editingId = projectForm.dataset.editProjectId;
+      if (!title || !needs) return;
+      if (editingId) {
+        const index = projectStore.findIndex((project) => project.id === editingId);
+        if (index < 0) return;
+        const updated = projectApi.normalizeProjects({ projects: [{ ...projectStore[index], title, description: needs, next_action: needs }] })[0];
+        if (!saveProjectEdit(updated)) return;
+        projectStore[index] = updated;
+      } else {
+        const project = addLocalProject(title, needs);
+        if (!project) return;
+        projectStore.push(project);
+      }
       renderWork(overlay);
-      projectForm.reset();
-      projectForm.hidden = true;
-      addProjectButton.hidden = false;
+      closeProjectForm();
       overlay.querySelector('[data-work-projects]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     const todayEntryForHealth = entryStore[todayKey] || entryList().at(-1);
