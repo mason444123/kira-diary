@@ -9,7 +9,10 @@
 
   const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   const entryStore = {};
+  let projectStore = [];
   const DATA_URL = 'data/entries.json';
+  const PROJECTS_URL = 'data/projects.json';
+  const projectApi = window.KiraProjects || null;
 
   function entryList() {
     return Object.values(entryStore).filter(Boolean).sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -41,6 +44,17 @@
     } catch (err) {
       console.warn('[KiraDiary] entries load failed', err);
       return {};
+    }
+  }
+  async function loadProjects() {
+    try {
+      const res = await fetch(`${PROJECTS_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) return [];
+      const payload = await res.json();
+      return projectApi ? projectApi.normalizeProjects(payload) : [];
+    } catch (err) {
+      console.warn('[KiraDiary] projects load failed', err);
+      return [];
     }
   }
 
@@ -172,6 +186,14 @@
             </section>
           </section>
 
+          <section class="kira-screen" data-screen="work">
+            <section class="work-summary-grid" data-work-summary></section>
+            <section class="work-section" data-work-now></section>
+            <section class="work-section" data-work-projects></section>
+            <section class="work-section" data-work-diary></section>
+            <section class="work-section work-readonly-note glass"><p class="label">Как добавить</p><strong>Через Kira / чат</strong><span>Задачи синхронизируются из data/projects.json. На статичном сайте нельзя сохранять их прямо из браузера.</span></section>
+          </section>
+
           <section class="kira-screen" data-screen="kira">
             <section class="health-card glass"><p class="label">Кира</p><strong>Автоподхват</strong><p class="plain-text">Если в сообщении или голосовом есть дневник, день, настроение, сон, стресс или здоровье — Кира должна перенести это в нужную дату.</p><div class="agent-flow"><span>текст/голос</span><i></i><span>анализ</span><i></i><span>дневник</span></div></section>
             <section class="health-detail glass"><p class="label">Готово для связки</p><strong>KiraDiaryBridge</strong><span>Позже подключим реальный автосейв из чата.</span></section>
@@ -185,6 +207,7 @@
         <nav class="multitool-nav" aria-label="Навигация">
           <button class="multitool-item is-active" type="button" aria-label="Главная" data-tab="home"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M6.5 10.2v8.3h11v-8.3"/><path d="M10 18.5v-5h4v5"/></svg><span>Главная</span></button>
           <button class="multitool-item" type="button" aria-label="Здоровье" data-tab="health"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7.8c0 5.2-8 10.2-8 10.2S4 13 4 7.8A4.2 4.2 0 0 1 12 6a4.2 4.2 0 0 1 8 1.8Z"/><path d="M8 12h2.2l1-2.5 1.7 5 1.1-2.5H16"/></svg><span>Здоровье</span></button>
+          <button class="multitool-item" type="button" aria-label="Работа" data-tab="work"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2"/><path d="M9 7V5h6v2M4 12h16M10 12v2h4v-2"/></svg><span>Работа</span></button>
           <button class="multitool-item" type="button" aria-label="Кира" data-tab="kira"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-4 3-6 6.5-6s5.7 2 6.5 6"/></svg><span>Кира</span></button>
           <button class="multitool-item" type="button" aria-label="Система" data-tab="system"><svg class="mt-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 7.4v8.2l-7 4.9-7-4.9V7.4z"/><path d="M5.4 7.8 12 11.8l6.6-4"/><path d="M12 11.8v8.1"/></svg><span>Система</span></button>
         </nav>
@@ -399,6 +422,42 @@
     renderHealthStats(overlay, selectedEntry || latestEntryInMonth(y, m));
   }
 
+  const projectStatusLabel = { active: 'В работе', paused: 'На паузе', archived: 'Архив' };
+  const taskStatusLabel = { inbox: 'Входящие', today: 'Сегодня', in_progress: 'В работе', waiting: 'Жду', done: 'Готово' };
+  function workSection(title, content) { return `<p class="label">${title}</p>${content}`; }
+  function workTaskHtml(item) {
+    const project = item.project || {};
+    const task = item.task || item;
+    return `<li class="work-task"><span><b>${escapeHtml(task.title)}</b><em>${escapeHtml(project.title || '')}</em></span><i>${escapeHtml(taskStatusLabel[task.status] || task.status)}</i></li>`;
+  }
+  function renderWork(overlay) {
+    const summaryRoot = overlay.querySelector('[data-work-summary]');
+    const nowRoot = overlay.querySelector('[data-work-now]');
+    const projectsRoot = overlay.querySelector('[data-work-projects]');
+    const diaryRoot = overlay.querySelector('[data-work-diary]');
+    if (!summaryRoot || !nowRoot || !projectsRoot || !diaryRoot || !projectApi) return;
+    const summary = projectApi.summarizeProjects(projectStore);
+    const diaryItems = projectApi.diaryWorkItems(entryStore).slice(0, 10);
+    summaryRoot.innerHTML = [
+      ['Проекты', summary.activeProjects], ['Сегодня', summary.todayTasks], ['В работе', summary.inProgressTasks], ['Блокеры', summary.blockers]
+    ].map(([label, value]) => `<article class="glass work-metric"><p>${label}</p><strong>${value}</strong></article>`).join('');
+    const now = projectApi.prioritizedTasks(projectStore, 5);
+    nowRoot.innerHTML = workSection('Сейчас', now.length
+      ? `<ul class="work-list">${now.map(workTaskHtml).join('')}</ul>`
+      : '<p class="work-empty">Нет открытых задач.</p>');
+    projectsRoot.innerHTML = workSection('Проекты', projectStore.length
+      ? `<div class="work-project-list">${projectStore.map((project, index) => {
+        const open = project.tasks.filter((task) => task.status !== 'done').length;
+        const blocker = project.blockers[0] || '';
+        const relatedDiaryItems = diaryItems.filter((item) => item.projectId === project.id || (!item.projectId && item.projectName === project.title));
+        return `<details class="glass work-project"${index === 0 ? ' open' : ''}><summary><span><b>${escapeHtml(project.title)}</b><em>${escapeHtml(projectStatusLabel[project.status] || project.status)}</em></span><i>${open} открыто</i></summary><div class="work-project-detail"><p>${escapeHtml(project.description || project.next_action || 'Следующее действие пока не задано.')}</p>${project.next_action ? `<p><small>Следующее:</small> ${escapeHtml(project.next_action)}</p>` : ''}${blocker ? `<p class="work-blocker"><small>Блокер:</small> ${escapeHtml(blocker)}</p>` : ''}<h3>Задачи</h3><ul class="work-list">${project.tasks.length ? project.tasks.map((task) => workTaskHtml({ project, task })).join('') : '<li class="work-empty">Задач пока нет.</li>'}</ul><h3>Решения</h3><ul class="work-decisions">${project.decisions.length ? project.decisions.map((item) => `<li><small>${escapeHtml(item.date)}</small>${escapeHtml(item.text)}</li>`).join('') : '<li class="work-empty">Решений пока нет.</li>'}</ul><h3>Сделано в дневнике</h3><ul class="work-decisions">${relatedDiaryItems.length ? relatedDiaryItems.map((item) => `<li><small>${escapeHtml(item.date)}</small>${escapeHtml(item.text)}</li>`).join('') : '<li class="work-empty">Нет связанных действий.</li>'}</ul></div></details>`;
+      }).join('')}</div>`
+      : '<p class="work-empty">Проектов пока нет. Добавь их через Kira/обновление data/projects.json.</p>');
+    diaryRoot.innerHTML = workSection('Сделано в дневнике', diaryItems.length
+      ? `<ul class="work-list">${diaryItems.map((item) => `<li class="work-task"><span><b>${escapeHtml(item.text)}</b><em>${escapeHtml(item.projectId || item.projectName || 'без проекта')} · ${escapeHtml(item.date)}</em></span></li>`).join('')}</ul>`
+      : '<p class="work-empty">В дневнике пока нет рабочих действий.</p>');
+  }
+
   async function mountOverlay() {
     document.title = 'Kira Diary';
     document.querySelectorAll('#kira-overlay').forEach((node) => node.remove());
@@ -413,7 +472,10 @@
     const detail = overlay.querySelector('[data-health-detail]');
     let visibleMonth = readVisibleMonth() || { y: now.getFullYear(), m: now.getMonth() };
 
-    Object.assign(entryStore, await loadEntries());
+    const [entries, projects] = await Promise.all([loadEntries(), loadProjects()]);
+    Object.assign(entryStore, entries);
+    projectStore = projects;
+    renderWork(overlay);
     const todayEntryForHealth = entryStore[todayKey] || entryList().at(-1);
 
     if (!readVisibleMonth() && todayEntryForHealth) {
@@ -430,6 +492,7 @@
     const titles = {
       home: ['', 'Автодневник · зеркало дня'],
       health: ['Здоровье', 'Календарь · паттерны · тело'],
+      work: ['Работа', 'Проекты · задачи · действия'],
       kira: ['Кира', 'Логика автоподхвата'],
       system: ['Система', 'Настройки · бэкап']
     };

@@ -2114,3 +2114,33 @@ body.kira-mode #kira-overlay .diary-text-card {
     grid-template-columns: 1fr;
   }
 }
+
+/* Work / Projects MVP */
+body.kira-mode #kira-overlay .multitool-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+body.kira-mode #kira-overlay [data-screen="work"].is-active { display: grid; gap: 14px; }
+body.kira-mode #kira-overlay .work-summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+body.kira-mode #kira-overlay .work-metric, body.kira-mode #kira-overlay .work-section { border-radius: 22px; padding: 15px; }
+body.kira-mode #kira-overlay .work-metric p, body.kira-mode #kira-overlay .work-section > .label { margin: 0 0 10px; color: rgba(255,255,255,.58); font-size: 10px; }
+body.kira-mode #kira-overlay .work-metric strong { display:block; font-size: 27px; line-height: 1; }
+body.kira-mode #kira-overlay .work-list, body.kira-mode #kira-overlay .work-decisions { margin: 0; padding: 0; list-style: none; }
+body.kira-mode #kira-overlay .work-task { display:flex; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid rgba(255,255,255,.10); }
+body.kira-mode #kira-overlay .work-task:first-child { border-top:0; padding-top:0; }
+body.kira-mode #kira-overlay .work-task span { min-width:0; display:grid; gap:4px; }
+body.kira-mode #kira-overlay .work-task b, body.kira-mode #kira-overlay .work-project summary b { font-size:13px; line-height:1.35; overflow-wrap:anywhere; }
+body.kira-mode #kira-overlay .work-task em, body.kira-mode #kira-overlay .work-project summary em { color:rgba(255,255,255,.55); font-size:10px; font-style:normal; }
+body.kira-mode #kira-overlay .work-task i, body.kira-mode #kira-overlay .work-project summary > i { color:#e6cd8b; font-size:9px; font-style:normal; text-transform:uppercase; text-align:right; }
+body.kira-mode #kira-overlay .work-empty { margin:0; color:rgba(255,255,255,.64); font-size:13px; line-height:1.55; }
+body.kira-mode #kira-overlay .work-project-list { display:grid; gap:10px; }
+body.kira-mode #kira-overlay .work-project { border-radius:20px; padding:0; }
+body.kira-mode #kira-overlay .work-project summary { display:flex; justify-content:space-between; gap:12px; cursor:pointer; padding:15px; list-style:none; }
+body.kira-mode #kira-overlay .work-project summary::-webkit-details-marker { display:none; }
+body.kira-mode #kira-overlay .work-project summary span { display:grid; gap:4px; min-width:0; }
+body.kira-mode #kira-overlay .work-project-detail { padding:0 15px 15px; color:rgba(255,255,255,.70); font-size:12px; line-height:1.55; }
+body.kira-mode #kira-overlay .work-project-detail h3 { margin:16px 0 8px; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+body.kira-mode #kira-overlay .work-project-detail p { margin:8px 0; }
+body.kira-mode #kira-overlay .work-project-detail small, body.kira-mode #kira-overlay .work-decisions small { color:#e6cd8b; margin-right:6px; }
+body.kira-mode #kira-overlay .work-blocker { color:#f1bd9a; }
+body.kira-mode #kira-overlay .work-decisions li { border-top:1px solid rgba(255,255,255,.10); padding:8px 0; overflow-wrap:anywhere; }
+body.kira-mode #kira-overlay .work-readonly-note strong { display:block; margin-bottom:7px; font-size:15px; }
+body.kira-mode #kira-overlay .work-readonly-note span { color:rgba(255,255,255,.64); font-size:12px; line-height:1.55; }
+@media (max-width: 360px) { body.kira-mode #kira-overlay .multitool-item { font-size:8px; } body.kira-mode #kira-overlay .work-metric { padding:12px; } }
