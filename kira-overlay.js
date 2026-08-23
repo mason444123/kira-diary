@@ -12,6 +12,7 @@
   let projectStore = [];
   const DATA_URL = 'data/entries.json';
   const PROJECTS_URL = 'data/projects.json';
+  const LOCAL_PROJECTS_KEY = 'kiraDiary.localProjects';
   const projectApi = window.KiraProjects || null;
 
   function entryList() {
@@ -56,6 +57,35 @@
       console.warn('[KiraDiary] projects load failed', err);
       return [];
     }
+  }
+  function readLocalProjects() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LOCAL_PROJECTS_KEY) || '[]');
+      return Array.isArray(saved) && projectApi ? projectApi.normalizeProjects({ projects: saved }) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+  function saveLocalProjects(projects) {
+    try { localStorage.setItem(LOCAL_PROJECTS_KEY, JSON.stringify(projects)); return true; } catch (_) { return false; }
+  }
+  function addLocalProject(title, needs) {
+    const id = `local-${Date.now()}`;
+    const cleanTitle = String(title).trim().slice(0, 90);
+    const cleanNeeds = String(needs).trim().slice(0, 500);
+    const project = {
+      id,
+      title: cleanTitle,
+      description: cleanNeeds,
+      status: 'active',
+      next_action: cleanNeeds || 'Определить первый следующий шаг',
+      blockers: [],
+      tasks: cleanNeeds ? [{ id: `${id}-first-step`, title: cleanNeeds, status: 'in_progress', priority: 'high', updated_at: dateKey() }] : [],
+      decisions: [{ date: dateKey(), text: 'Проект добавлен с панели управления.' }]
+    };
+    const localProjects = readLocalProjects();
+    if (!saveLocalProjects([...localProjects, project])) return null;
+    return projectApi.normalizeProjects({ projects: [project] })[0];
   }
 
   function dateKey(d = new Date()) {
@@ -191,6 +221,15 @@
             <section class="work-section" data-work-now></section>
             <section class="work-section" data-work-projects></section>
             <section class="work-section" data-work-diary></section>
+            <section class="work-add-project">
+              <button class="work-add-project-button" type="button" data-work-add-project>＋ Добавить проект</button>
+              <form class="glass work-project-form" data-work-project-form hidden>
+                <label>Название проекта<input name="title" type="text" maxlength="90" required placeholder="Например, новый бот"></label>
+                <label>Что нужно<textarea name="needs" maxlength="500" required placeholder="Коротко: что сделать, чего ждём или с чего начать"></textarea></label>
+                <div class="work-form-actions"><button type="submit">Добавить</button><button type="button" data-work-cancel-project>Отмена</button></div>
+                <small>Сохранится на этом устройстве. Для общей базы добавь через Киру.</small>
+              </form>
+            </section>
             <section class="work-section work-readonly-note glass"><p class="label">Как добавить</p><strong>Через Kira / чат</strong><span>Задачи синхронизируются из data/projects.json. На статичном сайте нельзя сохранять их прямо из браузера.</span></section>
           </section>
 
@@ -476,8 +515,33 @@
 
     const [entries, projects] = await Promise.all([loadEntries(), loadProjects()]);
     Object.assign(entryStore, entries);
-    projectStore = projects;
+    projectStore = [...projects, ...readLocalProjects()];
     renderWork(overlay);
+    const addProjectButton = overlay.querySelector('[data-work-add-project]');
+    const projectForm = overlay.querySelector('[data-work-project-form]');
+    const cancelProjectButton = overlay.querySelector('[data-work-cancel-project]');
+    addProjectButton?.addEventListener('click', () => {
+      projectForm.hidden = false;
+      addProjectButton.hidden = true;
+      projectForm.querySelector('[name="title"]')?.focus();
+    });
+    cancelProjectButton?.addEventListener('click', () => {
+      projectForm.reset();
+      projectForm.hidden = true;
+      addProjectButton.hidden = false;
+    });
+    projectForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const formData = new FormData(projectForm);
+      const project = addLocalProject(formData.get('title'), formData.get('needs'));
+      if (!project) return;
+      projectStore.push(project);
+      renderWork(overlay);
+      projectForm.reset();
+      projectForm.hidden = true;
+      addProjectButton.hidden = false;
+      overlay.querySelector('[data-work-projects]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
     const todayEntryForHealth = entryStore[todayKey] || entryList().at(-1);
 
     if (!readVisibleMonth() && todayEntryForHealth) {
