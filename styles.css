@@ -2144,3 +2144,22 @@ body.kira-mode #kira-overlay .work-decisions li { border-top:1px solid rgba(255,
 body.kira-mode #kira-overlay .work-readonly-note strong { display:block; margin-bottom:7px; font-size:15px; }
 body.kira-mode #kira-overlay .work-readonly-note span { color:rgba(255,255,255,.64); font-size:12px; line-height:1.55; }
 @media (max-width: 360px) { body.kira-mode #kira-overlay .multitool-item { font-size:8px; } body.kira-mode #kira-overlay .work-metric { padding:12px; } }
+
+/* Project cards: concise state first, full history only on open. */
+body.kira-mode #kira-overlay .work-project summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 18px 16px; }
+body.kira-mode #kira-overlay .work-project summary .work-project-title { display: grid; gap: 5px; }
+body.kira-mode #kira-overlay .work-project summary .work-project-title > b { font-size: 18px; line-height: 1.1; }
+body.kira-mode #kira-overlay .work-project-brief { grid-column: 1 / -1; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+body.kira-mode #kira-overlay .work-project-brief > span { display: grid !important; gap: 4px; min-width: 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.11); }
+body.kira-mode #kira-overlay .work-project-brief small, body.kira-mode #kira-overlay .work-next small, body.kira-mode #kira-overlay .work-blocker small { color: rgba(255,255,255,.48); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+body.kira-mode #kira-overlay .work-project-brief b { font-size: 11px; line-height: 1.42; overflow-wrap: anywhere; }
+body.kira-mode #kira-overlay .work-project-open { align-self: start; padding-top: 3px; }
+body.kira-mode #kira-overlay .work-description { margin: 0 0 14px !important; color: rgba(255,255,255,.62); }
+body.kira-mode #kira-overlay .work-next, body.kira-mode #kira-overlay .work-blocker { display: grid; gap: 5px; padding: 11px 12px; border: 1px solid rgba(255,255,255,.10); border-radius: 14px; }
+body.kira-mode #kira-overlay .work-next { margin: 0 0 12px !important; background: rgba(255,255,255,.035); }
+body.kira-mode #kira-overlay .work-blocker { margin: 14px 0 !important; }
+body.kira-mode #kira-overlay .work-readonly-note { display: none; }
+body.kira-mode #kira-overlay .work-detail-grid { display: grid; gap: 14px; }
+body.kira-mode #kira-overlay .work-detail-grid section { padding-top: 2px; }
+body.kira-mode #kira-overlay .work-detail-grid .work-task em { display: none; }
+body.kira-mode #kira-overlay .work-detail-grid .work-task { padding: 9px 0; }

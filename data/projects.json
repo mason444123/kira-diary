@@ -1,1 +1,105 @@
-{"projects": []}
+{
+  "projects": [
+    {
+      "id": "oblaka",
+      "title": "Облака",
+      "description": "Сайт и цифровая упаковка проекта «Облака».",
+      "status": "waiting",
+      "next_action": "Встреча с Ромой после 2 сентября",
+      "blockers": [
+        "Ждём встречу с Ромой после 2 сентября"
+      ],
+      "tasks": [
+        {
+          "id": "oblaka-site-base",
+          "title": "Собрать базовую версию сайта",
+          "status": "done",
+          "priority": "high",
+          "updated_at": "2026-08-23"
+        },
+        {
+          "id": "oblaka-meeting-roma",
+          "title": "Встретиться с Ромой и зафиксировать следующие правки",
+          "status": "waiting",
+          "priority": "high",
+          "updated_at": "2026-09-03"
+        }
+      ],
+      "decisions": [
+        {
+          "date": "2026-08-23",
+          "text": "Следующий шаг — не новые правки до обсуждения, а встреча с Ромой после 2 сентября."
+        }
+      ]
+    },
+    {
+      "id": "ne-voda",
+      "title": "НЕ ВОДА",
+      "description": "Сайт проекта НЕ ВОДА: основная публикация на Cloudflare Pages, резервная — GitHub Pages.",
+      "status": "waiting",
+      "next_action": "Получить и внести правки",
+      "blockers": [
+        "Жду правки по сайту"
+      ],
+      "tasks": [
+        {
+          "id": "ne-voda-publish",
+          "title": "Собрать и опубликовать текущую версию сайта",
+          "status": "done",
+          "priority": "high",
+          "updated_at": "2026-08-23"
+        },
+        {
+          "id": "ne-voda-edits",
+          "title": "Внести новые правки после обратной связи",
+          "status": "waiting",
+          "priority": "high",
+          "updated_at": "2026-08-23"
+        }
+      ],
+      "decisions": [
+        {
+          "date": "2026-08-23",
+          "text": "Текущую версию не менять до конкретного списка правок."
+        }
+      ]
+    },
+    {
+      "id": "video-clips",
+      "title": "Нарезки видео",
+      "description": "Направление коротких видео: подготовка каналов и исследование трафика перед запуском.",
+      "status": "active",
+      "next_action": "Продолжить прогрев YouTube-каналов и собрать выводы по исследованиям",
+      "blockers": [],
+      "tasks": [
+        {
+          "id": "video-clips-channel-warmup",
+          "title": "Прогревать YouTube-каналы",
+          "status": "in_progress",
+          "priority": "high",
+          "updated_at": "2026-08-23"
+        },
+        {
+          "id": "video-clips-research",
+          "title": "Изучить механику трафика, Shorts и воронки",
+          "status": "in_progress",
+          "priority": "high",
+          "updated_at": "2026-08-23"
+        },
+        {
+          "id": "video-clips-first-publications",
+          "title": "Подготовить первые публикации после исследования",
+          "status": "inbox",
+          "priority": "normal",
+          "updated_at": "2026-08-23"
+        }
+      ],
+      "decisions": [
+        {
+          "date": "2026-08-23",
+          "text": "Сначала прогрев и исследование; публикации — после выбора рабочей связки."
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,7 @@ const {
   summarizeProjects,
   prioritizedTasks,
   diaryWorkItems,
+  projectProgress,
 } = require('../work-projects.js');
 
 const projects = normalizeProjects({
@@ -31,6 +32,7 @@ assert.deepEqual(summarizeProjects(projects), {
   blockers: 1,
 });
 assert.deepEqual(prioritizedTasks(projects, 5).map((item) => item.task.id), ['a-work', 'a-today']);
+assert.deepEqual(projectProgress(projects[0]), { done: 1, remaining: 2, active: 1, waiting: 0 });
 
 const work = diaryWorkItems({
   '2026-08-23': { date: '2026-08-23', work: { project_id: 'alpha', done: ['Сделал безопасный экран'] } },

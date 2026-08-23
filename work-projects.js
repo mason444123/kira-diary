@@ -63,6 +63,16 @@
       .slice(0, Number.isFinite(limit) ? limit : 5);
   }
 
+  function projectProgress(project) {
+    const tasks = asArray(project && project.tasks);
+    return {
+      done: tasks.filter((task) => task.status === 'done').length,
+      remaining: tasks.filter((task) => task.status !== 'done').length,
+      active: tasks.filter((task) => task.status === 'in_progress').length,
+      waiting: tasks.filter((task) => task.status === 'waiting').length,
+    };
+  }
+
   function diaryWorkItems(entries) {
     return Object.values(entries && typeof entries === 'object' ? entries : {})
       .filter((entry) => entry && typeof entry === 'object')
@@ -80,5 +90,5 @@
       });
   }
 
-  return { normalizeProjects, summarizeProjects, prioritizedTasks, diaryWorkItems };
+  return { normalizeProjects, summarizeProjects, prioritizedTasks, projectProgress, diaryWorkItems };
 });

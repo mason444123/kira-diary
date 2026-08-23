@@ -422,13 +422,18 @@
     renderHealthStats(overlay, selectedEntry || latestEntryInMonth(y, m));
   }
 
-  const projectStatusLabel = { active: 'В работе', paused: 'На паузе', archived: 'Архив' };
+  const projectStatusLabel = { active: 'В работе', waiting: 'Жду', paused: 'На паузе', archived: 'Архив' };
   const taskStatusLabel = { inbox: 'Входящие', today: 'Сегодня', in_progress: 'В работе', waiting: 'Жду', done: 'Готово' };
   function workSection(title, content) { return `<p class="label">${title}</p>${content}`; }
   function workTaskHtml(item) {
     const project = item.project || {};
     const task = item.task || item;
     return `<li class="work-task"><span><b>${escapeHtml(task.title)}</b><em>${escapeHtml(project.title || '')}</em></span><i>${escapeHtml(taskStatusLabel[task.status] || task.status)}</i></li>`;
+  }
+  function taskItemsHtml(tasks, project, emptyText) {
+    return tasks.length
+      ? `<ul class="work-list">${tasks.map((task) => workTaskHtml({ project, task })).join('')}</ul>`
+      : `<p class="work-empty">${emptyText}</p>`;
   }
   function renderWork(overlay) {
     const summaryRoot = overlay.querySelector('[data-work-summary]');
@@ -437,25 +442,22 @@
     const diaryRoot = overlay.querySelector('[data-work-diary]');
     if (!summaryRoot || !nowRoot || !projectsRoot || !diaryRoot || !projectApi) return;
     const summary = projectApi.summarizeProjects(projectStore);
-    const diaryItems = projectApi.diaryWorkItems(entryStore).slice(0, 10);
     summaryRoot.innerHTML = [
-      ['Проекты', summary.activeProjects], ['Сегодня', summary.todayTasks], ['В работе', summary.inProgressTasks], ['Блокеры', summary.blockers]
+      ['Проекты', projectStore.length], ['В работе', summary.inProgressTasks], ['Жду', summary.blockers], ['Готово', projectStore.reduce((count, project) => count + projectApi.projectProgress(project).done, 0)]
     ].map(([label, value]) => `<article class="glass work-metric"><p>${label}</p><strong>${value}</strong></article>`).join('');
-    const now = projectApi.prioritizedTasks(projectStore, 5);
-    nowRoot.innerHTML = workSection('Сейчас', now.length
-      ? `<ul class="work-list">${now.map(workTaskHtml).join('')}</ul>`
-      : '<p class="work-empty">Нет открытых задач.</p>');
-    projectsRoot.innerHTML = workSection('Проекты', projectStore.length
-      ? `<div class="work-project-list">${projectStore.map((project, index) => {
-        const open = project.tasks.filter((task) => task.status !== 'done').length;
+    nowRoot.hidden = true;
+    diaryRoot.hidden = true;
+    projectsRoot.innerHTML = workSection('Главные проекты', projectStore.length
+      ? `<div class="work-project-list">${projectStore.map((project) => {
+        const progress = projectApi.projectProgress(project);
+        const doneTasks = project.tasks.filter((task) => task.status === 'done');
+        const nextTasks = project.tasks.filter((task) => task.status !== 'done');
+        const doneText = doneTasks[0]?.title || 'Пока нет завершённых шагов';
+        const nextText = nextTasks[0]?.title || project.next_action || 'Следующий шаг не задан';
         const blocker = project.blockers[0] || '';
-        const relatedDiaryItems = diaryItems.filter((item) => item.projectId === project.id || (!item.projectId && item.projectName === project.title));
-        return `<details class="glass work-project"${index === 0 ? ' open' : ''}><summary><span><b>${escapeHtml(project.title)}</b><em>${escapeHtml(projectStatusLabel[project.status] || project.status)}</em></span><i>${open} открыто</i></summary><div class="work-project-detail"><p>${escapeHtml(project.description || project.next_action || 'Следующее действие пока не задано.')}</p>${project.next_action ? `<p><small>Следующее:</small> ${escapeHtml(project.next_action)}</p>` : ''}${blocker ? `<p class="work-blocker"><small>Блокер:</small> ${escapeHtml(blocker)}</p>` : ''}<h3>Задачи</h3><ul class="work-list">${project.tasks.length ? project.tasks.map((task) => workTaskHtml({ project, task })).join('') : '<li class="work-empty">Задач пока нет.</li>'}</ul><h3>Решения</h3><ul class="work-decisions">${project.decisions.length ? project.decisions.map((item) => `<li><small>${escapeHtml(item.date)}</small>${escapeHtml(item.text)}</li>`).join('') : '<li class="work-empty">Решений пока нет.</li>'}</ul><h3>Сделано в дневнике</h3><ul class="work-decisions">${relatedDiaryItems.length ? relatedDiaryItems.map((item) => `<li><small>${escapeHtml(item.date)}</small>${escapeHtml(item.text)}</li>`).join('') : '<li class="work-empty">Нет связанных действий.</li>'}</ul></div></details>`;
+        return `<details class="glass work-project"><summary><span class="work-project-title"><b>${escapeHtml(project.title)}</b><em>${escapeHtml(projectStatusLabel[project.status] || project.status)}</em></span><span class="work-project-brief"><span><small>Сделано</small><b>${escapeHtml(doneText)}</b></span><span><small>${blocker ? 'Ждём' : 'Дальше'}</small><b>${escapeHtml(blocker || nextText)}</b></span></span><i class="work-project-open">Подробнее</i></summary><div class="work-project-detail"><p class="work-description">${escapeHtml(project.description || '')}</p>${project.next_action ? `<p class="work-next"><small>Ближайшее действие</small>${escapeHtml(project.next_action)}</p>` : ''}<div class="work-detail-grid"><section><h3>Сделано · ${progress.done}</h3>${taskItemsHtml(doneTasks, project, 'Пока нет завершённых задач.')}</section><section><h3>Дальше · ${progress.remaining}</h3>${taskItemsHtml(nextTasks, project, 'Следующих задач пока нет.')}</section></div>${blocker ? `<p class="work-blocker"><small>Ожидание / блокер</small>${escapeHtml(blocker)}</p>` : ''}<h3>Контекст</h3><ul class="work-decisions">${project.decisions.length ? project.decisions.map((item) => `<li><small>${escapeHtml(item.date)}</small>${escapeHtml(item.text)}</li>`).join('') : '<li class="work-empty">Заметок пока нет.</li>'}</ul></div></details>`;
       }).join('')}</div>`
       : '<p class="work-empty">Проектов пока нет. Добавь их через Kira/обновление data/projects.json.</p>');
-    diaryRoot.innerHTML = workSection('Сделано в дневнике', diaryItems.length
-      ? `<ul class="work-list">${diaryItems.map((item) => `<li class="work-task"><span><b>${escapeHtml(item.text)}</b><em>${escapeHtml(item.projectId || item.projectName || 'без проекта')} · ${escapeHtml(item.date)}</em></span></li>`).join('')}</ul>`
-      : '<p class="work-empty">В дневнике пока нет рабочих действий.</p>');
   }
 
   async function mountOverlay() {
